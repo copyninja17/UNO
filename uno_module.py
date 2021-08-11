@@ -1,5 +1,6 @@
 # import pydealer as pd
 import random
+import sys
 
 class Card():
 
@@ -22,18 +23,28 @@ class Deck():
     def __init__(self):
         self.colours = ['B', 'G', 'R', 'Y']
         self.values = ['1', '2', '3', '4', '5', '6', '7', '8' ,'9', 'skip', 'reverse', '+2']
-        # self.special = ['wild', 'draw 4']
-        # self.extras = ['0']
+        self.special = ['wild', '+4']
+        self.extras = ['0']
         self.deck = []
         self.build_deck()
         self = self.deck
 
 
     def build_deck(self):
+        for _ in range(2):
+            for c in self.colours:
+                for v in self.values:
+                    sample = Card()
+                    sample.generate(c,v)
+                    self.deck.append(sample)
         for c in self.colours:
-            for v in self.values:
+            sample = Card()
+            sample.generate(c, self.extras[0])
+            self.deck.append(sample)
+        for _ in range(4):
+            for s in self.special:
                 sample = Card()
-                sample.generate(c,v)
+                sample.generate('None', s)
                 self.deck.append(sample)
 
     def show(self):
@@ -80,20 +91,25 @@ class Stack():
     def add(self, lst):
         if isinstance(lst, Card):
             self.stack.append(lst)
-        # elif type(lst) == Card():
         else:
             self.stack += lst
 
 
 
-def compare(card, lst):
+def isplayable(base_card, lst, assumed_colour):
     playable = Stack()
     i=0
     while i!=len(lst.stack):
-        if lst.stack[i].card['colour'] == card.card['colour']:
+        # allows you to play normal + wild cards
+        if lst.stack[i].card['colour'] in [base_card.card['colour'], 'None']:
             playable.add(lst.deal(0, i)) #lst.deal(1, i)
-        elif lst.stack[i].card['val'] == card.card['val']:
+        elif lst.stack[i].card['val'] in [base_card.card['val'], '+4', 'wild']:
             playable.add(lst.deal(0, i))
+
+        # allows you to play card after wild and restrict unplayable cards
+        elif lst.stack[i].card['colour'] == assumed_colour and base_card.card['colour']=='None':
+            playable.add(lst.deal(0, i))
+
         else:
             i+=1
 
@@ -101,6 +117,47 @@ def compare(card, lst):
         return playable
     else:
         return 'None'
+
+
+def isaction(CARD):
+    if CARD.card['val'] == 'reverse':
+        return 'rev'
+    elif CARD.card['val'] == 'skip':
+        return 'skp'
+    elif CARD.card['val'] == '+2':
+        return '+2'
+    elif CARD.card['val'] == '+4':
+        return '+4'
+    elif CARD.card['val'] == 'wild':
+        return 'wld'
+    else:
+        return 'none'
+
+def Input(msg, input_type=str):
+    while True:
+        try:
+            return input_type(input(msg))
+        except ValueError:
+            print("Invalid input")
+        except:
+            print("Unexpected error:", sys.exc_info()[0])
+            raise
+
+def colour_switch():
+    while True: 
+        c = Input("Enter a colour: ", str)
+
+        try:
+            if c[0].upper() in ['R', 'B', 'G', 'Y']:
+                return c[0].upper()
+            else:
+                raise ValueError
+        except ValueError:
+            print("Invalid input")
+        except:
+            print("Unexpected error:", sys.exc_info()[0])
+            raise       
+
 
 
 
