@@ -60,6 +60,15 @@ class Deck():
             dealt_cards.append(self.deck.pop(0))
         return dealt_cards
     
+    def add(self, lst):
+        if isinstance(lst, Card):
+            self.deck.append(lst)
+        else:
+            self.deck += lst
+
+    def clear(self):
+        self.deck.clear()
+    
     def shuffle(self):
         random.shuffle(self.deck)
 
@@ -93,6 +102,10 @@ class Stack():
             self.stack.append(lst)
         else:
             self.stack += lst
+
+    def clear(self):
+        self.stack.clear()
+    
 
 
 
@@ -156,10 +169,24 @@ def colour_switch():
             print("Invalid input")
         except:
             print("Unexpected error:", sys.exc_info()[0])
-            raise       
+            raise
 
+def isAI():
+    while True: 
+        c = Input("Is this player computer? (Y/N): ", str)
 
-
+        try:
+            if c[0].upper() == 'Y':
+                return True
+            elif c[0].upper() == 'N':
+                return False
+            else:
+                raise ValueError
+        except ValueError:
+            print("Invalid input")
+        except:
+            print("Unexpected error:", sys.exc_info()[0])
+            raise
 
 
 #--------------------------------------------------------------------------------
@@ -171,3 +198,4 @@ def colour_switch():
 # uno.print_deck(stack)
 # print("################")
 # uno.print_deck(uno.deck)
+

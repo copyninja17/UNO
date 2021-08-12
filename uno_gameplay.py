@@ -1,5 +1,6 @@
 import uno_module as uno
 from os import system
+import uno_ai as ai
 
 game = True
 players = []
@@ -7,10 +8,15 @@ players = []
 while game:
     n = uno.Input("Enter the number of players: ", int)
     for i in range(n):
-        sample_dict = {'name':0, 'hand':0}
+        sample_dict = {'name':0, 'hand':0, 'ai':0}
         p = input("Enter the name of player " + str(i+1) +  ": ")
         sample_dict['name'] = p
+        if i!=0:
+            isAI = uno.isAI()
+            sample_dict['ai'] = isAI
+            sample_dict['name'] = p + " [AI]" if isAI is True else p
         players.append(sample_dict)
+
 
     system('cls')
 
@@ -45,16 +51,18 @@ while game:
 
         if playable_cards != 'None':
             print(f"Playable cards: {playable_cards.show()}")
-            q = True
-            while q:
-                played_card = uno.Input("Play a card: ", int)
+            while True:
+                if players[0]['ai'] == True:
+                    played_card = ai.ask_ai(1, len(playable_cards.stack))
+                else:
+                    played_card = uno.Input("Play a card: ", int)
 
                 if played_card > 0 and played_card <= len(playable_cards.stack):
                     discard_pile.add(playable_cards.deal(0, played_card-1))
                     print(f"Card played: {discard_pile.stack[-1].show()}")
 
                     players[0]['hand'].add(playable_cards.stack)
-                    q = False
+                    break
                 else:
                     print(f"Please enter a number between 1 and {len(playable_cards.stack)}")
             
@@ -85,14 +93,14 @@ while game:
             players[-1]['hand'].add(deck.deal(2))
             print(f"{players[-1]['name']} drew 2 cards!")
         elif uno.isaction(discard_pile.stack[-1]) == '+4':
-            assumed_colour = uno.colour_switch()
+            assumed_colour = uno.colour_switch() if players[0]['ai'] == False else ai.ask_ai(0,0, True)
             print(f"Colour has been changed to {assumed_colour}!")
             players.append(players.pop(0))
             players.append(players.pop(0))
             players[-1]['hand'].add(deck.deal(4))
             print(f"{players[-1]['name']} drew 4 cards!")
         elif uno.isaction(discard_pile.stack[-1]) == 'wld':
-            assumed_colour = uno.colour_switch()
+            assumed_colour = uno.colour_switch() if players[0]['ai'] == False else ai.ask_ai(0,0, True)
             print(f"Colour has been changed to {assumed_colour}!")
             players.append(players.pop(0))
 

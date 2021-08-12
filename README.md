@@ -11,6 +11,7 @@ We plan on bringing this multiplayer card game to PC with support for more than 
 - Non-playable hands need to draw a card
 - Game ends when a player has 0 cards
 - Action cards
+- AI players
 
 ### Bugs
 - code breaks when deck empties
