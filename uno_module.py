@@ -1,4 +1,3 @@
-# import pydealer as pd
 import random
 import sys
 
@@ -114,15 +113,8 @@ def isplayable(base_card, lst, assumed_colour):
     i=0
     while i!=len(lst.stack):
         # allows you to play normal + wild cards
-        if lst.stack[i].card['colour'] in [base_card.card['colour'], 'None']:
-            playable.add(lst.deal(0, i)) #lst.deal(1, i)
-        elif lst.stack[i].card['val'] in [base_card.card['val'], '+4', 'wild']:
+        if (lst.stack[i].card['colour'] in [base_card.card['colour'], 'None']) or (lst.stack[i].card['val'] in [base_card.card['val'], '+4', 'wild']) or (lst.stack[i].card['colour'] == assumed_colour and base_card.card['colour']=='None'):
             playable.add(lst.deal(0, i))
-
-        # allows you to play card after wild and restrict unplayable cards
-        elif lst.stack[i].card['colour'] == assumed_colour and base_card.card['colour']=='None':
-            playable.add(lst.deal(0, i))
-
         else:
             i+=1
 
