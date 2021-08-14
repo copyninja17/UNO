@@ -1,4 +1,3 @@
-# import pydealer as pd
 import random
 import sys
 
@@ -60,6 +59,15 @@ class Deck():
             dealt_cards.append(self.deck.pop(0))
         return dealt_cards
     
+    def add(self, lst):
+        if isinstance(lst, Card):
+            self.deck.append(lst)
+        else:
+            self.deck += lst
+
+    def clear(self):
+        self.deck.clear()
+    
     def shuffle(self):
         random.shuffle(self.deck)
 
@@ -94,6 +102,10 @@ class Stack():
         else:
             self.stack += lst
 
+    def clear(self):
+        self.stack.clear()
+    
+
 
 
 def isplayable(base_card, lst, assumed_colour):
@@ -101,15 +113,8 @@ def isplayable(base_card, lst, assumed_colour):
     i=0
     while i!=len(lst.stack):
         # allows you to play normal + wild cards
-        if lst.stack[i].card['colour'] in [base_card.card['colour'], 'None']:
-            playable.add(lst.deal(0, i)) #lst.deal(1, i)
-        elif lst.stack[i].card['val'] in [base_card.card['val'], '+4', 'wild']:
+        if (lst.stack[i].card['colour'] in [base_card.card['colour'], 'None']) or (lst.stack[i].card['val'] in [base_card.card['val'], '+4', 'wild']) or (lst.stack[i].card['colour'] == assumed_colour and base_card.card['colour']=='None'):
             playable.add(lst.deal(0, i))
-
-        # allows you to play card after wild and restrict unplayable cards
-        elif lst.stack[i].card['colour'] == assumed_colour and base_card.card['colour']=='None':
-            playable.add(lst.deal(0, i))
-
         else:
             i+=1
 
@@ -156,10 +161,24 @@ def colour_switch():
             print("Invalid input")
         except:
             print("Unexpected error:", sys.exc_info()[0])
-            raise       
+            raise
 
+def isAI():
+    while True: 
+        c = Input("Is this player computer? (Y/N): ", str)
 
-
+        try:
+            if c[0].upper() == 'Y':
+                return True
+            elif c[0].upper() == 'N':
+                return False
+            else:
+                raise ValueError
+        except ValueError:
+            print("Invalid input")
+        except:
+            print("Unexpected error:", sys.exc_info()[0])
+            raise
 
 
 #--------------------------------------------------------------------------------
@@ -171,3 +190,4 @@ def colour_switch():
 # uno.print_deck(stack)
 # print("################")
 # uno.print_deck(uno.deck)
+
