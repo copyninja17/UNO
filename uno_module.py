@@ -18,7 +18,7 @@ class Card():
 
 
 class Deck():
-    
+
     def __init__(self):
         self.colours = ['B', 'G', 'R', 'Y']
         self.values = ['1', '2', '3', '4', '5', '6', '7', '8' ,'9', 'skip', 'reverse', '+2']
@@ -95,7 +95,7 @@ class Stack():
             new_stack.append(self.stack.pop(pos))
 
         return new_stack
-    
+
     def add(self, lst):
         if isinstance(lst, Card):
             self.stack.append(lst)
@@ -104,15 +104,13 @@ class Stack():
 
     def clear(self):
         self.stack.clear()
-    
 
 
 
-def isplayable(base_card, lst, assumed_colour):
+def isplayable(base_card, lst, assumed_colour='0'):
     playable = Stack()
     i=0
     while i!=len(lst.stack):
-        # allows you to play normal + wild cards
         if (lst.stack[i].card['colour'] in [base_card.card['colour'], 'None']) or (lst.stack[i].card['val'] in [base_card.card['val'], '+4', 'wild']) or (lst.stack[i].card['colour'] == assumed_colour and base_card.card['colour']=='None'):
             playable.add(lst.deal(0, i))
         else:
@@ -179,15 +177,4 @@ def isAI():
         except:
             print("Unexpected error:", sys.exc_info()[0])
             raise
-
-
-#--------------------------------------------------------------------------------
-# Testing
-#--------------------------------------------------------------------------------
-# uno=UNO()
-# uno.build_deck()
-# stack = uno.deal(uno.deck, 7)
-# uno.print_deck(stack)
-# print("################")
-# uno.print_deck(uno.deck)
 
