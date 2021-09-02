@@ -15,7 +15,7 @@ class Client():
         self.choice = 0
         self.colour = '0'
         self.event = ['0', 'regular', 'no_cards', '+4/+2', 'reverse', 'skip']
-        self.playerName = uno.Input("Enter your name: ", str)
+        self.playerName = uno.Input("Enter your name: ", str, 3)
         self.playerList = []
 
     @staticmethod
@@ -74,10 +74,10 @@ class Client():
 
 
 client = Client()
-
+print("DEBUG LINE #1")
 # one time data
 client.playerList = client.parse(client.send_recv(oneTime=True))
-
+print("DEBUG LINE #2")
 while True:
     # os.system('cls')
     top_card, player_hand, eventID, drawn_cards, playerTurn = client.parse(client.send_recv())

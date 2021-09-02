@@ -8,11 +8,15 @@ class Card():
         self = self.card
 
     def generate(self, colour, value):
-        self.card['colour'] = colour
-        self.card['val'] = value
+        self.card['colour'] = str(colour)
+        self.card['val'] = str(value)
 
     def show(self):
         string = str(self.card['val']) + " of " + str(self.card['colour'])
+        return string
+
+    def conv(self):
+        string = str(self.card['val']) + str(self.card['colour'])
         return string
 
 
@@ -22,7 +26,7 @@ class Deck():
     def __init__(self):
         self.colours = ['B', 'G', 'R', 'Y']
         self.values = ['1', '2', '3', '4', '5', '6', '7', '8' ,'9', 'skip', 'reverse', '+2']
-        self.special = ['wild', '+4']
+        # self.special = ['wild', '+4']
         self.extras = ['0']
         self.deck = []
         self.build_deck()
@@ -40,11 +44,11 @@ class Deck():
             sample = Card()
             sample.generate(c, self.extras[0])
             self.deck.append(sample)
-        for _ in range(4):
-            for s in self.special:
-                sample = Card()
-                sample.generate('None', s)
-                self.deck.append(sample)
+        # for _ in range(4):
+        #     for s in self.special:
+        #         sample = Card()
+        #         sample.generate('None', s)
+        #         self.deck.append(sample)
 
     def show(self):
         lst = []
@@ -105,6 +109,12 @@ class Stack():
     def clear(self):
         self.stack.clear()
 
+    def conv(self):
+        lst = []
+        for i in self.stack:
+            lst.append(i.conv())
+        return ','.join(lst)
+
 
 
 def isplayable(base_card, lst, assumed_colour='0'):
@@ -136,12 +146,18 @@ def isaction(CARD):
     else:
         return 'none'
 
-def Input(msg, input_type=str):
+def Input(msg, input_type=str, min_len=1):
     while True:
         try:
-            return input_type(input(msg))
+            inp = input_type(input(msg))
+            if len(inp)>min_len:
+                return inp
+            else:
+                BufferError
         except ValueError:
             print("Invalid input")
+        except BufferError:
+            print(f"Input should be atleast {min_len} characters long")
         except:
             print("Unexpected error:", sys.exc_info()[0])
             raise
