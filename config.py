@@ -15,3 +15,5 @@ myPlayerList = []
 myPlayers = []
 
 myReplies={}
+
+Winner = 'NONE'

@@ -90,13 +90,13 @@ class Stack():
             lst.append(string)
         return lst
 
-    def deal(self, n, pos=0):
+    def deal(self, numOfCards, cardPos=0):
         new_stack = []
-        if n!=0:
-            for _ in range(n):
+        if numOfCards!=0:
+            for _ in range(numOfCards):
                 new_stack.append(self.stack.pop(0))
         else:
-            new_stack.append(self.stack.pop(pos))
+            new_stack.append(self.stack.pop(cardPos))
 
         return new_stack
 
@@ -133,24 +133,24 @@ def isplayable(base_card, lst, assumed_colour='0'):
 
 
 def isaction(CARD):
-    if CARD.card['val'] == 'reverse':
-        return 'rev'
-    elif CARD.card['val'] == 'skip':
-        return 'skp'
-    elif CARD.card['val'] == '+2':
-        return '+2'
-    elif CARD.card['val'] == '+4':
-        return '+4'
-    elif CARD.card['val'] == 'wild':
-        return 'wld'
-    else:
-        return 'none'
+    # if CARD.card['val'] == 'reverse':
+    #     return 'rev'
+    # elif CARD.card['val'] == 'skip':
+    #     return 'skp'
+    # elif CARD.card['val'] == '+2':
+    #     return '+2'
+    # elif CARD.card['val'] == '+4':
+    #     return '+4'
+    # elif CARD.card['val'] == 'wild':
+    #     return 'wld'
+    # else:
+    return 'none'
 
 def Input(msg, input_type=str, min_len=1):
     while True:
         try:
             inp = input_type(input(msg))
-            if len(inp)>min_len:
+            if len(str(inp))>=min_len:
                 return inp
             else:
                 BufferError

@@ -1,7 +1,9 @@
 import os
+from platform import system
 from bridge import Network
 import uno_module as uno
 import time
+import keyboard
 
 '''
 Missing features: Are you host?: add in a run file maybe
@@ -47,14 +49,16 @@ class Client():
                 eventID = int(data.split(":")[2])
 
                 drawn_cards = uno.Stack()
-                for i in list(data.split(":")[1].split(",")):
+                for i in list(data.split(":")[3].split(",")):
                     sample = uno.Card()
                     sample.generate(i[-1], i[:-1])
                     drawn_cards.add(sample)
 
-                playerTurn = bool(data.split(":")[4])
+                playerTurn = bool(int(data.split(":")[4]))
 
-                return top_card, player_hand, eventID, drawn_cards, playerTurn
+                winner = data.split(":")[5]
+
+                return top_card, player_hand, eventID, drawn_cards, playerTurn, winner
 
             except ValueError or TypeError or IndexError:
                 print("ERROR RETRIEVING DATA FROM SERVER!")
@@ -74,32 +78,53 @@ class Client():
 
 
 client = Client()
-print("DEBUG LINE #1")
+temp = 'NEW'
+
 # one time data
 client.playerList = client.parse(client.send_recv(oneTime=True))
-print("DEBUG LINE #2")
 while True:
-    # os.system('cls')
-    top_card, player_hand, eventID, drawn_cards, playerTurn = client.parse(client.send_recv())
-    print(top_card.show(), player_hand.show(), eventID, drawn_cards.show(), playerTurn)
+    data = client.send_recv()
 
+    # so the client won't refresh always
+    if temp == data:
+        continue
+    else:
+        temp = data
+
+    top_card, player_hand, eventID, drawn_cards, playerTurn, winner = client.parse(data)
+
+    # winner/loser
+    if winner == client.playerName:
+        print("YOU ARE THE WINNER!!")
+        break
+    elif winner != 'NONE':
+        print(f"Winner is {winner}")
+        break
+
+    os.system('cls')
+    print(data)
     print("\n+" + "-"*(13+len(top_card.show())) + "+")
     print("|" + f" Top card = {top_card.show()} " + "|")
     print("+" + "-"*(13+len(top_card.show())) + "+")
-
+    
+    print(f"Your cards: {player_hand.show()}")
+    
     if playerTurn is True:
 
         if client.event[eventID] == 'regular':
-            print(f"Your turn {client.net.id}: {player_hand.show()}")
+            print(f"Your turn {client.playerName}: ")
             playable_cards = uno.isplayable(top_card, player_hand)
-            print(f"Playable cards: {playable_cards.show()}")
+            try:
+                print(f"Playable cards: {playable_cards.show()}")
+            except:
+                print(f"Playable cards: {playable_cards}")
 
             while True:
                 played_card = uno.Input("Play a card: ", int)
 
                 if played_card > 0 and played_card <= len(playable_cards.stack):
                     print(f"Card played: {playable_cards.stack[played_card-1].show()}")
-                    if playable_cards[played_card-1].card['colour'] == 'None':
+                    if playable_cards.stack[played_card-1].card['colour'] == 'None':
                         client.colour = uno.colour_switch()
                         client.choice = played_card
                     else:
@@ -108,24 +133,26 @@ while True:
                     break
                 else:
                     print(f"Please enter a number between 1 and {len(playable_cards.stack)}")
-            time.sleep(2)
 
         elif client.event[eventID] == 'no_cards':
-            print(f"Your turn {client.net.id}: {player_hand.show()}")
+            print(f"Your turn {client.playerName}:")
             print("You have no playable cards")
-            print(f"Card drawn: {drawn_cards.stack[0].show()}")
-            time.sleep(2)
+            print(f"Card drawn: {drawn_cards.show()}")
+            print("Press 'enter' to continue")
+            while True:
+                x = input()
+                if x == '':
+                    break
+            client.choice = '0'
+            client.colour = 'N'
 
         elif client.event[eventID] == '+4/+2':
             print(f"+{len(drawn_cards.stack)} was used on you")
             print(f"Cards drawn: {drawn_cards.show()}")
-            time.sleep(2)
 
         elif client.event[eventID] == 'skip':
             print("Your turn was skipped.")
-            time.sleep(2)
-
     else:
-        # os.system('cls')
+        client.colour = '0'
+        client.choice = '0'
         print("not my turn")
-        time.sleep(2)
