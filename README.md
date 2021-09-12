@@ -44,7 +44,7 @@ Run [ngrok](https://ngrok.com/) and enter:
 ```powershell
 ngrok tcp -region in 5555
 ```
-Ask players to enter the generated address in [uno_client](/uno_client)'s console window.
+Ask players to enter the generated address in [uno_client](/uno_client.py)'s console window.
 
 # Gameplay
 Play a card by entering the serial number of "Playable Cards". If none, press enter. Winner gets decided by getting to 0 cards first.
@@ -59,4 +59,4 @@ Refer to [unorules.com](https://www.unorules.com/) for standard uno rules.
 
 # License
 Copyright © 2021 Mohit Pradhan.
-This project is [MIT](/LISCENSE) licensed.
+This project is [MIT](/LISCENSE.md) licensed.
