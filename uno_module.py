@@ -8,21 +8,25 @@ class Card():
         self = self.card
 
     def generate(self, colour, value):
-        self.card['colour'] = colour
-        self.card['val'] = value
+        self.card['colour'] = str(colour)
+        self.card['val'] = str(value)
 
     def show(self):
         string = str(self.card['val']) + " of " + str(self.card['colour'])
         return string
 
+    def conv(self):
+        string = str(self.card['val']) + str(self.card['colour'])
+        return string
+
 
 
 class Deck():
-    
+
     def __init__(self):
         self.colours = ['B', 'G', 'R', 'Y']
         self.values = ['1', '2', '3', '4', '5', '6', '7', '8' ,'9', 'skip', 'reverse', '+2']
-        self.special = ['wild', '+4']
+        # self.special = ['wild', '+4']
         self.extras = ['0']
         self.deck = []
         self.build_deck()
@@ -40,11 +44,11 @@ class Deck():
             sample = Card()
             sample.generate(c, self.extras[0])
             self.deck.append(sample)
-        for _ in range(4):
-            for s in self.special:
-                sample = Card()
-                sample.generate('None', s)
-                self.deck.append(sample)
+        # for _ in range(4):
+        #     for s in self.special:
+        #         sample = Card()
+        #         sample.generate('None', s)
+        #         self.deck.append(sample)
 
     def show(self):
         lst = []
@@ -86,16 +90,16 @@ class Stack():
             lst.append(string)
         return lst
 
-    def deal(self, n, pos=0):
+    def deal(self, numOfCards, cardPos=0):
         new_stack = []
-        if n!=0:
-            for _ in range(n):
+        if numOfCards!=0:
+            for _ in range(numOfCards):
                 new_stack.append(self.stack.pop(0))
         else:
-            new_stack.append(self.stack.pop(pos))
+            new_stack.append(self.stack.pop(cardPos))
 
         return new_stack
-    
+
     def add(self, lst):
         if isinstance(lst, Card):
             self.stack.append(lst)
@@ -104,15 +108,19 @@ class Stack():
 
     def clear(self):
         self.stack.clear()
-    
+
+    def conv(self):
+        lst = []
+        for i in self.stack:
+            lst.append(i.conv())
+        return ','.join(lst)
 
 
 
-def isplayable(base_card, lst, assumed_colour):
+def isplayable(base_card, lst, assumed_colour='0'):
     playable = Stack()
     i=0
     while i!=len(lst.stack):
-        # allows you to play normal + wild cards
         if (lst.stack[i].card['colour'] in [base_card.card['colour'], 'None']) or (lst.stack[i].card['val'] in [base_card.card['val'], '+4', 'wild']) or (lst.stack[i].card['colour'] == assumed_colour and base_card.card['colour']=='None'):
             playable.add(lst.deal(0, i))
         else:
@@ -125,25 +133,31 @@ def isplayable(base_card, lst, assumed_colour):
 
 
 def isaction(CARD):
-    if CARD.card['val'] == 'reverse':
-        return 'rev'
-    elif CARD.card['val'] == 'skip':
-        return 'skp'
-    elif CARD.card['val'] == '+2':
-        return '+2'
-    elif CARD.card['val'] == '+4':
-        return '+4'
-    elif CARD.card['val'] == 'wild':
-        return 'wld'
-    else:
-        return 'none'
+    # if CARD.card['val'] == 'reverse':
+    #     return 'rev'
+    # elif CARD.card['val'] == 'skip':
+    #     return 'skp'
+    # elif CARD.card['val'] == '+2':
+    #     return '+2'
+    # elif CARD.card['val'] == '+4':
+    #     return '+4'
+    # elif CARD.card['val'] == 'wild':
+    #     return 'wld'
+    # else:
+    return 'none'
 
-def Input(msg, input_type=str):
+def Input(msg, input_type=str, min_len=1):
     while True:
         try:
-            return input_type(input(msg))
+            inp = input_type(input(msg))
+            if len(str(inp))>=min_len:
+                return inp
+            else:
+                BufferError
         except ValueError:
             print("Invalid input")
+        except BufferError:
+            print(f"Input should be atleast {min_len} characters long")
         except:
             print("Unexpected error:", sys.exc_info()[0])
             raise
@@ -179,15 +193,4 @@ def isAI():
         except:
             print("Unexpected error:", sys.exc_info()[0])
             raise
-
-
-#--------------------------------------------------------------------------------
-# Testing
-#--------------------------------------------------------------------------------
-# uno=UNO()
-# uno.build_deck()
-# stack = uno.deal(uno.deck, 7)
-# uno.print_deck(stack)
-# print("################")
-# uno.print_deck(uno.deck)
 
