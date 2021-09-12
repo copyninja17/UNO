@@ -59,4 +59,4 @@ Refer to [unorules.com](https://www.unorules.com/) for standard uno rules.
 
 # License
 Copyright © 2021 Mohit Pradhan.
-This project is [MIT](/LISCENSE.md) licensed.
+This project is [MIT](/LICENSE.md) licensed.
