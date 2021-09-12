@@ -24,7 +24,7 @@ try:
 except socket.error as e:
     print(str(e))
 
-roomSize = 2  # will actually come from host client
+roomSize = uno.Input("Enter room size: ", int)  #[TODO] will actually come from host client
 
 s.listen(roomSize)
 print("Waiting for a connection")
@@ -199,16 +199,29 @@ def threaded_server():
             # write action code
             if uno.isaction(config.myDiscard_pile.stack[-1]) == 'skp':
                 config.myStorage = database(config.myPlayers[0]['name'], 5)
+                while True:
+                    # trapping until input is recieved
+                    colour = config.myReplies[config.myPlayers[0]['name']]['colour']
+                    if colour =='N': # N = Nil[client has received data]
+                        print(f"{config.myPlayers[0]['name']} HAS RECEIVED")
+                        break
 
             elif uno.isaction(config.myDiscard_pile.stack[-1]) == '+2':
                 config.myPlayers[0]['hand'].add(Deal(2))
-                drawn_cards = [config.myPlayers[0]['hand'].stack[-1].conv(), config.myPlayers[0]['hand'].stack[-2].conv()]
+                drawn_cards = config.myPlayers[0]['hand'].stack[-1].conv() + "," + config.myPlayers[0]['hand'].stack[-2].conv()
                 config.myStorage = database(config.myPlayers[0]['name'], 3, drawn_cards)
+                while True:
+                    # trapping until input is recieved
+                    colour = config.myReplies[config.myPlayers[0]['name']]['colour']
+                    if colour =='N': # N = Nil[client has received data]
+                        print(f"{config.myPlayers[0]['name']} HAS RECEIVED")
+                        break
 
-            elif uno.isaction(config.myDiscard_pile.stack[-1]) == 'rev':
-                config.myStorage = database(config.myPlayers[0]['name'], 4)
-                config.myPlayers.reverse()
-                config.myPlayers.append(config.myPlayers.pop(0))
+            # elif uno.isaction(config.myDiscard_pile.stack[-1]) == 'rev':
+            #     config.myStorage = database(config.myPlayers[0]['name'], 4)
+            #     config.myPlayers.reverse()
+            #     config.myPlayers.append(config.myPlayers.pop(0))
+            
 
         config.myPlayers.append(config.myPlayers.pop(0))
 

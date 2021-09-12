@@ -1,19 +1,19 @@
 import os
-from platform import system
 from bridge import Network
 import uno_module as uno
 import time
-import keyboard
 
 '''
 Missing features: Are you host?: add in a run file maybe
 '''
 
+address, port = input("Enter Server Address: ").split(":")
+# address, port = "localhost", "5555"
 
 class Client():
 
     def __init__(self):
-        self.net = Network()
+        self.net = Network(address, port)
         self.choice = 0
         self.colour = '0'
         self.event = ['0', 'regular', 'no_cards', '+4/+2', 'reverse', 'skip']
@@ -95,14 +95,24 @@ while True:
 
     # winner/loser
     if winner == client.playerName:
-        print("YOU ARE THE WINNER!!")
+        print("\nYOU ARE THE WINNER!!\n")
+        print("Press 'enter' to continue")
+        while True:
+            x = input()
+            if x == '':
+                break
         break
     elif winner != 'NONE':
-        print(f"Winner is {winner}")
+        print(f"\nWinner is {winner}\n")
+        print("Press 'enter' to continue")
+        while True:
+            x = input()
+            if x == '':
+                break
         break
 
     os.system('cls')
-    print(data)
+    # print(data)
     print("\n+" + "-"*(13+len(top_card.show())) + "+")
     print("|" + f" Top card = {top_card.show()} " + "|")
     print("+" + "-"*(13+len(top_card.show())) + "+")
@@ -149,9 +159,23 @@ while True:
         elif client.event[eventID] == '+4/+2':
             print(f"+{len(drawn_cards.stack)} was used on you")
             print(f"Cards drawn: {drawn_cards.show()}")
+            print("Press 'enter' to continue")
+            while True:
+                x = input()
+                if x == '':
+                    break
+            client.choice = '0'
+            client.colour = 'N'
 
         elif client.event[eventID] == 'skip':
             print("Your turn was skipped.")
+            print("Press 'enter' to continue")
+            while True:
+                x = input()
+                if x == '':
+                    break
+            client.choice = '0'
+            client.colour = 'N'
     else:
         client.colour = '0'
         client.choice = '0'

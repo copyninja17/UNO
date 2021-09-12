@@ -1,4 +1,7 @@
 import uno_module as uno
+'''
+Holds global variables for all scripts to access
+'''
 
 myDeck = uno.Deck()
 myDeck.shuffle()
