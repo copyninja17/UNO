@@ -1,33 +1,39 @@
-import os
-from bridge import Network
 import uno_module as uno
-import time
+from bridge import Network
+import os
 
 '''
-Missing features: Are you host?: add in a run file maybe
+Missing features: Are you the host?: add in a run file maybe
 '''
 
-address, port = input("Enter Server Address: ").split(":")
-# address, port = "localhost", "5555"
+# address, port = input("Enter Server Address: ").split(":")
+address, port = "localhost", "5555"
 
-class Client():
+class Client:
 
     def __init__(self):
+        '''
+        Initializes the Client.
+        '''
+
         self.net = Network(address, port)
         self.choice = 0
         self.colour = '0'
-        self.event = ['0', 'regular', 'no_cards', '+4/+2', 'reverse', 'skip']
+        self.event = ['0', 'regular', 'no_cards', '+4/+2', 'reverse', 'skip', 'wild']
         self.playerName = uno.Input("Enter your name: ", str, 3)
         self.playerList = []
 
     @staticmethod
     def parse(data):
         '''
-        decodes received data
-        data form: "topCard:playerHand:responseID:cardList:playerTurn"
+        Decodes received data from server
+
+        Data form: "topCard: playerHand: responseID: cardList: playerTurn: winner: chosenColour"
         [TODO]: what's going on in the game unrelated to the player
         '''
+
         if ':' not in data:
+            # playerList received
             try:
                 print(f"Player list retrived: {data}")
                 return data
@@ -36,6 +42,7 @@ class Client():
                 print("ERROR RETRIEVING DATA FROM SERVER!")
                 return 0
         else:
+            # game data received
             try:
                 top_card = uno.Card()
                 top_card.generate(data.split(":")[0][-1], data.split(":")[0][:-1])
@@ -58,7 +65,9 @@ class Client():
 
                 winner = data.split(":")[5]
 
-                return top_card, player_hand, eventID, drawn_cards, playerTurn, winner
+                chosenColour = data.split(":")[6]
+
+                return top_card, player_hand, eventID, drawn_cards, playerTurn, winner, chosenColour
 
             except ValueError or TypeError or IndexError:
                 print("ERROR RETRIEVING DATA FROM SERVER!")
@@ -66,8 +75,11 @@ class Client():
 
     def send_recv(self, oneTime=False):
         '''
-        sends data and returns reply
+        Sends data to server and returns reply.
+
+        ontTime: If True, exchanges playerName with playerList.
         '''
+
         if oneTime:
             reply = self.net.communicate(self.playerName)
             return reply
@@ -78,20 +90,22 @@ class Client():
 
 
 client = Client()
-temp = 'NEW'
+oldData = 'NEW'
 
-# one time data
+# Retrieve playerList (one time data)
 client.playerList = client.parse(client.send_recv(oneTime=True))
+
 while True:
     data = client.send_recv()
 
     # so the client won't refresh always
-    if temp == data:
+    if oldData == data:
         continue
     else:
-        temp = data
+        oldData = data
 
-    top_card, player_hand, eventID, drawn_cards, playerTurn, winner = client.parse(data)
+    # data received
+    top_card, player_hand, eventID, drawn_cards, playerTurn, winner, chosenColour = client.parse(data)
 
     # winner/loser
     if winner == client.playerName:
@@ -112,7 +126,8 @@ while True:
         break
 
     os.system('cls')
-    # print(data)
+
+    # prints top card
     print("\n+" + "-"*(13+len(top_card.show())) + "+")
     print("|" + f" Top card = {top_card.show()} " + "|")
     print("+" + "-"*(13+len(top_card.show())) + "+")
@@ -122,20 +137,24 @@ while True:
     if playerTurn is True:
 
         if client.event[eventID] == 'regular':
-            print(f"Your turn {client.playerName}: ")
-            playable_cards = uno.isplayable(top_card, player_hand)
-            try:
-                print(f"Playable cards: {playable_cards.show()}")
-            except:
+            print(f"\nYour turn {client.playerName}:\n")
+
+            playable_cards = uno.isPlayable(top_card, player_hand, chosenColour)
+            try:  # if cards are playable
+                print(f"Playable cards: ")
+                for i in range(len(playable_cards.stack)):
+                    print(f"{i+1}. {playable_cards.show()[i]}")
+            except:  # if playable cards are 'None' (already resolved on server)[FIXME]
                 print(f"Playable cards: {playable_cards}")
 
             while True:
+                # Traps the user until input is received
                 played_card = uno.Input("Play a card: ", int)
 
                 if played_card > 0 and played_card <= len(playable_cards.stack):
                     print(f"Card played: {playable_cards.stack[played_card-1].show()}")
-                    if playable_cards.stack[played_card-1].card['colour'] == 'None':
-                        client.colour = uno.colour_switch()
+                    if playable_cards.stack[played_card-1].card['colour'] == 'X':
+                        client.colour = uno.colourSwitch()
                         client.choice = played_card
                     else:
                         client.choice = played_card
@@ -148,8 +167,10 @@ while True:
             print(f"Your turn {client.playerName}:")
             print("You have no playable cards")
             print(f"Card drawn: {drawn_cards.show()}")
+
             print("Press 'enter' to continue")
             while True:
+                # convert into a separate 'ENTER' function [FIXME]
                 x = input()
                 if x == '':
                     break
@@ -159,8 +180,10 @@ while True:
         elif client.event[eventID] == '+4/+2':
             print(f"+{len(drawn_cards.stack)} was used on you")
             print(f"Cards drawn: {drawn_cards.show()}")
+
             print("Press 'enter' to continue")
             while True:
+                # convert into a separate 'ENTER' function [FIXME]
                 x = input()
                 if x == '':
                     break
@@ -169,8 +192,10 @@ while True:
 
         elif client.event[eventID] == 'skip':
             print("Your turn was skipped.")
+
             print("Press 'enter' to continue")
             while True:
+                # convert into a separate 'ENTER' function [FIXME]
                 x = input()
                 if x == '':
                     break
