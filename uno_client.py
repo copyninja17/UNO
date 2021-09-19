@@ -6,8 +6,8 @@ import os
 Missing features: Are you the host?: add in a run file maybe
 '''
 
-# address, port = input("Enter Server Address: ").split(":")
-address, port = "localhost", "5555"
+address, port = input("Enter Server Address: ").split(":")
+# address, port = "localhost", "5555"
 
 class Client:
 
