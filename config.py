@@ -19,4 +19,8 @@ myPlayers = []
 
 myReplies={}
 
+actionEffect = False
+
+assumedColour = '0'
+
 Winner = 'NONE'

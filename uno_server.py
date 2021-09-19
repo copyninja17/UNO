@@ -1,7 +1,6 @@
 import uno_module as uno
 import os
 import uno_ai as ai
-import time
 import socket
 from _thread import *
 import threading
@@ -43,7 +42,7 @@ def encode(dct):
     '''
     converts dct into sendable string
     '''
-    string = str(dct['topCard']) + ":" + str(dct['hand']) + ":" + str(dct['eventID']) + ":" + str(dct['drawnCards']) + ":" + str(dct['playerTurn']) + ":" + str(config.Winner)
+    string = str(dct['topCard']) + ":" + str(dct['hand']) + ":" + str(dct['eventID']) + ":" + str(dct['drawnCards']) + ":" + str(dct['playerTurn']) + ":" + str(dct['winner']) + ":" + str(dct['chosenColour'])
     return string
 
 def run_once(f):
@@ -74,7 +73,9 @@ def database(name='0', eventID=0, drawnCards='00'):
                                             'hand':config.myPlayers[i]['hand'].conv(),
                                             'eventID': eventID,
                                             'playerTurn': playerTurn,
-                                            'drawnCards': drawnCards
+                                            'drawnCards': drawnCards,
+                                            'winner': config.Winner,
+                                            'chosenColour': config.assumedColour
                                             }
     return dct
 
@@ -97,11 +98,11 @@ def prepare():
 
     # doesn't allow +4 on first turn
     while True:
-        if config.myDeck.deck[0].card['val'] == '+4':
+        if config.myDeck.deck[0].card['colour'] == 'X':
             config.myDeck.shuffle()
         else:
             break
-    print("+4 clause")
+    print("wild clause")
 
     # creating config.myReplies
     for i in config.myPlayerList:
@@ -141,17 +142,13 @@ def threaded_server():
         else:
             continue
         
-        # [XXX] UNUSED
-        # if config.myReplies[config.myPlayers[0]['name']]['choice'] == 'X':
-        #     continue
-        
         print(f"it's {config.myPlayers[0]['name']} turn")
-        if uno.isaction(config.myDiscard_pile.stack[-1]) == 'none':
+        if config.actionEffect == False:
             copied_hand = uno.Stack()
             lst = list(config.myPlayers[0]['hand'].stack)
             copied_hand.add(lst)
 
-            playable_cards = uno.isplayable(config.myDiscard_pile.stack[-1], copied_hand)
+            playable_cards = uno.isPlayable(config.myDiscard_pile.stack[-1], copied_hand, config.assumedColour)
 
             if playable_cards != 'None':
                 print(f"{config.myPlayers[0]['name']} has playable cards")
@@ -161,6 +158,7 @@ def threaded_server():
                     choice = int(config.myReplies[config.myPlayers[0]['name']]['choice'])
                     if choice != 0:
                         print(f"{config.myPlayers[0]['name']} HAS CHOSEN")
+                        config.assumedColour = config.myReplies[config.myPlayers[0]['name']]['colour']
                         played_card = choice-1
                         config.myDiscard_pile.add(playable_cards.deal(0, played_card))
                         copied_hand.add(playable_cards.stack)
@@ -168,6 +166,10 @@ def threaded_server():
                         config.myPlayers[0]['hand'].add(copied_hand.stack)  # at this point we have successfully played the card
                         print(f"remaining hand: {config.myPlayers[0]['hand'].show()}")
                         print(f"hand length = {len(config.myPlayers[0]['hand'].stack)}")
+                        
+                        if uno.isAction(config.myDiscard_pile.stack[-1]) != 'None' and config.myDiscard_pile.stack[-1].card['val'] != 'wild':
+                            config.actionEffect = True
+
 
                         if len(config.myPlayers[0]['hand'].stack) == 0:
                             print(f"Winner is {config.myPlayers[0]['name']}!!")
@@ -188,16 +190,19 @@ def threaded_server():
                     if colour =='N': # N = Nil[client has received data]
                         print(f"{config.myPlayers[0]['name']} HAS RECEIVED")
                         break
+            
+            if uno.isAction(config.myDiscard_pile.stack[-1]) == 'rev':
+                config.actionEffect = False
+                config.myPlayers.reverse()
+                continue
 
-        # elif uno.isaction(config.myDiscard_pile.stack[-1]) == 'wld':
-        #     # write wild card code here
-        #     # [TODO] YOU WERE SUPPOSED TO CHOOSE A COLOUR, YET YOU CHOSE AN EASIER PATH
-        #     pass
+            config.myPlayers.append(config.myPlayers.pop(0))
 
         else:
             print(f"{config.myPlayers[0]['name']} is facing an action situation")
             # write action code
-            if uno.isaction(config.myDiscard_pile.stack[-1]) == 'skp':
+            if uno.isAction(config.myDiscard_pile.stack[-1]) == 'skp':
+                config.actionEffect = False
                 config.myStorage = database(config.myPlayers[0]['name'], 5)
                 while True:
                     # trapping until input is recieved
@@ -205,8 +210,10 @@ def threaded_server():
                     if colour =='N': # N = Nil[client has received data]
                         print(f"{config.myPlayers[0]['name']} HAS RECEIVED")
                         break
+                config.myPlayers.append(config.myPlayers.pop(0))
 
-            elif uno.isaction(config.myDiscard_pile.stack[-1]) == '+2':
+            elif uno.isAction(config.myDiscard_pile.stack[-1]) == '+2':
+                config.actionEffect = False
                 config.myPlayers[0]['hand'].add(Deal(2))
                 drawn_cards = config.myPlayers[0]['hand'].stack[-1].conv() + "," + config.myPlayers[0]['hand'].stack[-2].conv()
                 config.myStorage = database(config.myPlayers[0]['name'], 3, drawn_cards)
@@ -216,15 +223,21 @@ def threaded_server():
                     if colour =='N': # N = Nil[client has received data]
                         print(f"{config.myPlayers[0]['name']} HAS RECEIVED")
                         break
-
-            # elif uno.isaction(config.myDiscard_pile.stack[-1]) == 'rev':
-            #     config.myStorage = database(config.myPlayers[0]['name'], 4)
-            #     config.myPlayers.reverse()
-            #     config.myPlayers.append(config.myPlayers.pop(0))
+                config.myPlayers.append(config.myPlayers.pop(0))
             
-
-        config.myPlayers.append(config.myPlayers.pop(0))
-
+            elif uno.isAction(config.myDiscard_pile.stack[-1]) == '+4':
+                config.actionEffect = False
+                config.myPlayers[0]['hand'].add(Deal(4))
+                drawn_cards = config.myPlayers[0]['hand'].stack[-1].conv() + "," + config.myPlayers[0]['hand'].stack[-2].conv() + "," + config.myPlayers[0]['hand'].stack[-3].conv() + "," + config.myPlayers[0]['hand'].stack[-4].conv()
+                config.myStorage = database(config.myPlayers[0]['name'], 3, drawn_cards)
+                while True:
+                    # trapping until input is recieved
+                    colour = config.myReplies[config.myPlayers[0]['name']]['colour']
+                    if colour =='N': # N = Nil[client has received data]
+                        print(f"{config.myPlayers[0]['name']} HAS RECEIVED")
+                        break
+                config.myPlayers.append(config.myPlayers.pop(0))
+        
 
 th = threading.Thread(target=threaded_server)
 th.start()
@@ -247,8 +260,6 @@ def threaded_client(conn):
                 conn.send(str.encode("Goodbye"))
                 break
             else:
-                # print("Recieved: " + reply)
-
                 if ":" in reply:  # if client requests game data
                     config.myReplies[name]['choice'], config.myReplies[name]['colour'] = parse(reply)
                     if config.myReplies[name]['choice'] != '0':
@@ -258,7 +269,6 @@ def threaded_client(conn):
                         print(f"Latest reply = {reply}")
                     else:
                         reply = encode(config.myStorage[name])
-                        # print(f"Sending to {name}: {reply}")
 
                 else:  # if client requests config.myPlayerList
                     config.myPlayerList.append(reply)
