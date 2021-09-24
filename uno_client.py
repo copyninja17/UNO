@@ -1,4 +1,5 @@
 import uno_module as uno
+from broadcast_msg import Broadcast
 from bridge import Network
 import os
 
@@ -6,8 +7,8 @@ import os
 Missing features: Are you the host?: add in a run file maybe
 '''
 
-address, port = input("Enter Server Address: ").split(":")
-# address, port = "localhost", "5555"
+# address, port = input("Enter Server Address: ").split(":")
+address, port = "localhost", "5555"
 
 class Client:
 
@@ -67,7 +68,11 @@ class Client:
 
                 chosenColour = data.split(":")[6]
 
-                return top_card, player_hand, eventID, drawn_cards, playerTurn, winner, chosenColour
+                broadcast = {}
+                broadcast['currentPlayer'] = int(data.split(":")[7].split(",")[0])
+                broadcast['action'] = int(data.split(":")[7].split(",")[1])
+
+                return top_card, player_hand, eventID, drawn_cards, playerTurn, winner, chosenColour, broadcast
 
             except ValueError or TypeError or IndexError:
                 print("ERROR RETRIEVING DATA FROM SERVER!")
@@ -82,7 +87,7 @@ class Client:
 
         if oneTime:
             reply = self.net.communicate(self.playerName)
-            return reply
+            return reply.split(",")
         else:
             data = str(self.net.id) + ":" + str(self.choice) + "," + str(self.colour)
             reply = self.net.communicate(data)
@@ -105,27 +110,22 @@ while True:
         oldData = data
 
     # data received
-    top_card, player_hand, eventID, drawn_cards, playerTurn, winner, chosenColour = client.parse(data)
+    top_card, player_hand, eventID, drawn_cards, playerTurn, winner, chosenColour, broadcast = client.parse(data)
 
     # winner/loser
     if winner == client.playerName:
         print("\nYOU ARE THE WINNER!!\n")
-        print("Press 'enter' to continue")
-        while True:
-            x = input()
-            if x == '':
-                break
+        uno.pressEnterKey()
         break
+
     elif winner != 'NONE':
         print(f"\nWinner is {winner}\n")
-        print("Press 'enter' to continue")
-        while True:
-            x = input()
-            if x == '':
-                break
+        uno.pressEnterKey()
         break
 
     os.system('cls')
+
+    Broadcast(client.playerList[broadcast['currentPlayer']], broadcast['action'], client.event[eventID])
 
     # prints top card
     print("\n+" + "-"*(13+len(top_card.show())) + "+")
@@ -167,38 +167,20 @@ while True:
             print(f"Your turn {client.playerName}:")
             print("You have no playable cards")
             print(f"Card drawn: {drawn_cards.show()}")
-
-            print("Press 'enter' to continue")
-            while True:
-                # convert into a separate 'ENTER' function [FIXME]
-                x = input()
-                if x == '':
-                    break
+            uno.pressEnterKey()
             client.choice = '0'
             client.colour = 'N'
 
         elif client.event[eventID] == '+4/+2':
             print(f"+{len(drawn_cards.stack)} was used on you")
             print(f"Cards drawn: {drawn_cards.show()}")
-
-            print("Press 'enter' to continue")
-            while True:
-                # convert into a separate 'ENTER' function [FIXME]
-                x = input()
-                if x == '':
-                    break
+            uno.pressEnterKey()
             client.choice = '0'
             client.colour = 'N'
 
         elif client.event[eventID] == 'skip':
             print("Your turn was skipped.")
-
-            print("Press 'enter' to continue")
-            while True:
-                # convert into a separate 'ENTER' function [FIXME]
-                x = input()
-                if x == '':
-                    break
+            uno.pressEnterKey()
             client.choice = '0'
             client.colour = 'N'
     else:

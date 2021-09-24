@@ -24,3 +24,5 @@ actionEffect = False
 assumedColour = '0'
 
 Winner = 'NONE'
+
+broadcast = {'currentPlayer':0, 'action':0}

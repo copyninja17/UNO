@@ -42,7 +42,7 @@ def encode(dct):
     '''
     converts dct into sendable string
     '''
-    string = str(dct['topCard']) + ":" + str(dct['hand']) + ":" + str(dct['eventID']) + ":" + str(dct['drawnCards']) + ":" + str(dct['playerTurn']) + ":" + str(dct['winner']) + ":" + str(dct['chosenColour'])
+    string = str(dct['topCard']) + ":" + str(dct['hand']) + ":" + str(dct['eventID']) + ":" + str(dct['drawnCards']) + ":" + str(dct['playerTurn']) + ":" + str(dct['winner']) + ":" + str(dct['chosenColour']) + ":" + str(dct['broadcast']['currentPlayer']) + "," + str(dct['broadcast']['action'])
     return string
 
 def run_once(f):
@@ -75,7 +75,8 @@ def database(name='0', eventID=0, drawnCards='00'):
                                             'playerTurn': playerTurn,
                                             'drawnCards': drawnCards,
                                             'winner': config.Winner,
-                                            'chosenColour': config.assumedColour
+                                            'chosenColour': config.assumedColour,
+                                            'broadcast': config.broadcast
                                             }
     return dct
 
@@ -88,7 +89,7 @@ def prepare():
     print("preparing")
 
     for i in range(roomSize):
-        sample_dict = {'name': 0, 'hand': 0}
+        sample_dict = {'name': 0, 'hand': 0, 'id': i}
         sample_dict['name'] = config.myPlayerList[i]
         stack = uno.Stack()
         stack.add(config.myDeck.deal(7))
@@ -143,6 +144,8 @@ def threaded_server():
             continue
         
         print(f"it's {config.myPlayers[0]['name']} turn")
+        config.broadcast['currentPlayer'] = config.myPlayers[0]['id']
+
         if config.actionEffect == False:
             copied_hand = uno.Stack()
             lst = list(config.myPlayers[0]['hand'].stack)
