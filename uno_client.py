@@ -1,12 +1,20 @@
 import uno_module as uno
 from bridge import Network
 import os
+import subprocess, sys
 
 '''
 Missing features: Are you the host?: add in a run file maybe
 '''
 
-address, port = input("Enter Server Address: ").split(":")
+hostConf = sys.argv[1]
+if hostConf == '1':
+    roomSize = uno.Input("Enter room size: ", int)
+    subprocess.Popen([sys.executable, 'uno_server.py', str(roomSize)],
+                                         creationflags=subprocess.CREATE_NEW_CONSOLE)
+    address, port = "localhost", "5555"
+else:
+    address, port = input("Enter Server Address: ").split(":")
 # address, port = "localhost", "5555"
 
 class Client:
