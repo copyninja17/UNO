@@ -1,4 +1,4 @@
-import uno_module as uno
+from src import uno_module as uno
 '''
 Holds global variables for all scripts to access
 '''
@@ -24,3 +24,7 @@ actionEffect = False
 assumedColour = '0'
 
 Winner = 'NONE'
+
+waitQuit = 0
+
+Page = 0
