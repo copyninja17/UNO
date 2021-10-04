@@ -28,3 +28,7 @@ Winner = 'NONE'
 waitQuit = 0
 
 Page = 0
+
+waitingTime = 0
+
+buttonFlip = 1
