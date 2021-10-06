@@ -1,4 +1,5 @@
 from src import uno_module as uno
+
 '''
 Holds global variables for all scripts to access
 '''
@@ -25,9 +26,11 @@ assumedColour = '0'
 
 Winner = 'NONE'
 
-waitQuit = 0
+buttonUpdate = 0
 
 Page = 0
+
+lastPage = None
 
 waitingTime = 0
 
