@@ -1,8 +1,14 @@
-from src import uno_module as uno
+try:
+    from src import uno_module as uno
+except:
+    import uno_module as uno
 
 '''
 Holds global variables for all scripts to access
 '''
+#-----------------------------------
+# Backend
+#----------------------------------- 
 
 myDeck = uno.Deck()
 myDeck.shuffle()
@@ -25,6 +31,17 @@ actionEffect = False
 assumedColour = '0'
 
 Winner = 'NONE'
+
+
+#-----------------------------------
+# GUI
+#----------------------------------- 
+
+host = None
+
+settings = None
+
+playerName = ''
 
 buttonUpdate = 0
 

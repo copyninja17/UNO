@@ -8,13 +8,14 @@ Missing features: Are you the host?: add in a run file maybe
 '''
 
 hostConf = sys.argv[1]
-if hostConf == '1':
-    roomSize = uno.Input("Enter room size: ", int)
-    subprocess.Popen([sys.executable, 'uno_server.py', str(roomSize)],
+
+if hostConf == 'True':
+    roomSize = sys.argv[2]
+    subprocess.Popen([sys.executable, 'src/uno_server.py', str(roomSize)],
                                          creationflags=subprocess.CREATE_NEW_CONSOLE)
     address, port = "localhost", "5555"
 else:
-    address, port = input("Enter Server Address: ").split(":")
+    address, port = sys.argv[2].split(":")
 # address, port = "localhost", "5555"
 
 class Client:
@@ -28,7 +29,7 @@ class Client:
         self.choice = 0
         self.colour = '0'
         self.event = ['0', 'regular', 'no_cards', '+4/+2', 'reverse', 'skip', 'wild']
-        self.playerName = uno.Input("Enter your name: ", str, 3)
+        self.playerName = sys.argv[3]
         self.playerList = []
 
     @staticmethod

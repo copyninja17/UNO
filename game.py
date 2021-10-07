@@ -3,7 +3,7 @@ from src import button
 import subprocess, sys
 import pygame_textinput as pti
 from src import config
-from pages import hostPrompt, enterRoomSize, serverAddress
+from pages import hostPrompt, enterRoomSize, serverAddress, startGame
 
 pygame.init()
 
@@ -131,6 +131,16 @@ textinputName = pti.TextInputVisualizer(manager=nameInputManager, font_object=mc
 
 
 #-----------------------------------
+# enter name
+#-----------------------------------
+waitinglobbyImg = pygame.image.load('assets/textures/waitinglobby.png').convert_alpha()
+waitinglobbyButton = button.Button(SCREEN_WIDTH/2-waitinglobbyImg.get_width()/2*0.4,
+                                   SCREEN_HEIGHT/4,
+                                   waitinglobbyImg,
+                                   0.4)
+
+
+#-----------------------------------
 # Game Loop
 #-----------------------------------
 run = True
@@ -170,6 +180,7 @@ while run:
                                               TEXTBOX_WIDTH,
                                               TEXTBOX_HEIGHT))
 
+    # enter name
     elif config.Page == 3:
         enterNameButton.draw(screen)
         textinputName.update(events)
@@ -179,7 +190,8 @@ while run:
                                               TEXTBOX_HEIGHT))
 
     elif config.Page == 4:
-        print("WAITING LOBBY")
+        waitinglobbyButton.draw(screen)
+        # wait for server to start
 
     if config.waitingTime:
         pygame.time.wait(config.waitingTime)
@@ -202,13 +214,14 @@ while run:
         if event.type == pygame.KEYDOWN and event.key == pygame.K_RETURN:
 
             if config.Page == 3:
-                playerName = textinputName.value
-                print(f"Name = {playerName}")
+                config.playerName = textinputName.value
+                print(f"Name = {config.playerName}")
                 config.Page = 4
                 textinputName.value = ''
+                startGame.start()
 
             elif config.Page == 2:
-                enteredAddress = textinputCustom.value
+                config.settings = textinputCustom.value
                 print(f"Entered Address = {enteredAddress}")
                 config.lastPage = config.Page
                 config.Page = 3

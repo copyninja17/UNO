@@ -7,7 +7,6 @@ import threading
 import config
 import sys
 
-
 # local declarations
 currentId = "0"
 
@@ -24,7 +23,6 @@ try:
 except socket.error as e:
     print(str(e))
 
-# roomSize = uno.Input("Enter room size: ", int)  #[TODO] will actually come from host client
 roomSize = int(sys.argv[1])
 
 s.listen(roomSize)

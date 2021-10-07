@@ -1,4 +1,3 @@
-import sys
 from src import config, button
 
 def display(screen, roomSizeButtons, roomSizeButtonsFinal, roomSizeNames):
@@ -7,6 +6,6 @@ def display(screen, roomSizeButtons, roomSizeButtonsFinal, roomSizeNames):
             if roomSizeButtons[i][j].draw(screen):
                 # roomSizeButtons[i][j] = 
                 roomSizeButtonsFinal[i][j].draw(screen)
-                selectedButton = roomSizeNames[i][j]
-                print(selectedButton)
+                config.settings = roomSizeNames[i][j]
+                print(f"roomsize: {config.settings}")
                 config.buttonUpdate += 1
