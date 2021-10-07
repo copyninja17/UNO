@@ -43,7 +43,7 @@ joinButton = button.Button(450, 200, joinRoom, 0.4)
 #-----------------------------------
 
 # loading images
-sample_button = pygame.image.load('assets/textures/2.png').convert_alpha()
+sample_button = pygame.image.load('assets/textures/buttons/2.png').convert_alpha()
 enterRoomSize_ = pygame.image.load('assets/textures/roomsize.png').convert_alpha()
 
 # Creating butttons
@@ -66,9 +66,9 @@ count = 2
 for i in range(3):
     for j in range(3):
         roomSizeButtons[i].append(pygame.image.load(
-                                  f'assets/textures/{count}.png').convert_alpha())
+                                  f'assets/textures/buttons/{count}.png').convert_alpha())
         roomSizeButtonsFinal[i].append(pygame.image.load(
-                                       f'assets/textures/{count}final.png').convert_alpha())
+                                       f'assets/textures/buttons/{count}final.png').convert_alpha())
         roomSizeNames[i].append(str(count))
         count += 1
 
