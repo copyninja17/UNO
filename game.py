@@ -111,7 +111,7 @@ ngrokFinButton = button.Button(SCREEN_WIDTH/2 - ngrokFinImg.get_width()/2*2.8*0.
                                ngrokFinImg,
                                0.27)
 
-textInputManager = pti.TextInputManager(validator = lambda input: len(input) <= 17)
+textInputManager = pti.TextInputManager(validator = lambda input: len(input) <= 24)
 textinputCustom = pti.TextInputVisualizer(manager=textInputManager, font_object=mcFont)
 enteredAddress = ''
 

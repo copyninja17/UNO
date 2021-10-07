@@ -4,19 +4,21 @@ UNO is a fun card game where players put down matching cards and the one with 0 
 We are bringing this multiplayer card game to PC with support for more than 4 players.
 > The official android version of **[Mattel UNO](https://play.google.com/store/apps/details?id=com.matteljv.uno&hl=en_IN&gl=US)** supports only 4 players
 
-## v0.6 beta
+## v0.7 beta
 
 ### Features
 - Playable over LAN or internet using [ngrok](https://ngrok.com/)
 - Game ends when any player has 0 cards
+- ngrok button disabled
 
 ### Bugs
-- CPU player temporarily removed
+- AI player temporarily removed
+- Disconnecting mid match crashes game for other players
 
 ### Upcoming Features
 - Party rules
-- Graphics
-- What other players are doing
+- Full Graphics
+- Broadcasting
 
 # Installation
 Install [PyInstaller](https://pyinstaller.readthedocs.io/en/stable/) from [pip](https://pip.pypa.io/en/stable/)
@@ -29,21 +31,19 @@ pip3 install pyinstaller
 ```
 Make the game into a windows executable by running
 ```bash
-pyinstaller --onefile -c "uno_client.py"
-
-pyinstaller --onefile -c "uno_server.py"
+pyinstaller --onefile -c "game.py"
 ```
 
 Install [ngrok](https://ngrok.com/) to play with friends over internet
 
 # Usage
-One player runs the [uno_server](/uno_server.py) and enters "Room Size". 
+One player(Host) creates the room and enters the room size. 
 
-Run [ngrok](https://ngrok.com/) and enter:
+Host runs [ngrok](https://ngrok.com/) and enter:
 ```powershell
 ngrok tcp -region in 5555
 ```
-Ask players to enter the generated address in [uno_client](/uno_client.py)'s console window.
+Other players can join by entering the address in their game.
 
 # Gameplay
 Play a card by entering the serial number of "Playable Cards". If none, press enter. Winner gets decided by getting to 0 cards first.
@@ -52,6 +52,8 @@ Refer to [unorules.com](https://www.unorules.com/) for standard uno rules.
 
 # Contributors
 - [Ayush Gupta](https://github.com/AyushGupta57)
+- [Akanksha](https://github.com/itsjustakanksha)
+- [Astitva Singh](https://github.com/astitva-s)
 
 # Author 
 - [Mohit Pradhan](https://github.com/copyninja17)
