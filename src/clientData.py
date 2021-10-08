@@ -1,3 +1,4 @@
+from pages.startGame import printHand
 from src import config
 from src.bridge import Network
 from src import uno_module as uno
@@ -122,104 +123,96 @@ def display(addrPort):
         # top_card, player_hand, eventID, drawn_cards, playerTurn, winner, chosenColour = client.parse(data)
         cc.top_card, cc.player_hand, cc.eventID, cc.drawn_cards, cc.playerTurn, cc.winner, cc.chosenColour = client.parse(data)
 
-        # # winner/loser
-        # if winner == client.playerName:
-        #     print("\nYOU ARE THE WINNER!!\n")
-        #     print("Press 'enter' to continue")
-        #     while True:
-        #         x = input()
-        #         if x == '':
-        #             break
-        #     break
-        # elif winner != 'NONE':
-        #     print(f"\nWinner is {winner}\n")
-        #     print("Press 'enter' to continue")
-        #     while True:
-        #         x = input()
-        #         if x == '':
-        #             break
-        #     break
+        # winner/loser
+        if cc.winner == client.playerName:
+            print("\nYOU ARE THE WINNER!!\n")
 
+        elif cc.winner != 'NONE':
+            print(f"\nWinner is {cc.winner}\n")
         # os.system('cls')
 
         # # prints top card
         # print("\n+" + "-"*(13+len(top_card.show())) + "+")
-        # print("|" + f" Top card = {top_card.show()} " + "|")
+        print("|" + f" Top card = {cc.top_card.show()} " + "|")
         # print("+" + "-"*(13+len(top_card.show())) + "+")
         
-        # print(f"Your cards: {player_hand.show()}")
+        print(f"Your cards: {cc.player_hand.show()}")
         
-        # if playerTurn is True:
-
-        #     if client.event[eventID] == 'regular':
+        if cc.playerTurn is True:
+            if client.event[cc.eventID] == 'regular':
         #         print(f"\nYour turn {client.playerName}:\n")
+                played_card = 0
+                fake_hand = uno.Stack()
+                fake_hand.add(cc.player_hand.stack)
+                cc.playable_cards = uno.isPlayable(cc.top_card, fake_hand, cc.chosenColour)
 
-        #         playable_cards = uno.isPlayable(top_card, player_hand, chosenColour)
-        #         try:  # if cards are playable
-        #             print(f"Playable cards: ")
-        #             for i in range(len(playable_cards.stack)):
-        #                 print(f"{i+1}. {playable_cards.show()[i]}")
-        #         except:  # if playable cards are 'None' (already resolved on server)[FIXME]
-        #             print(f"Playable cards: {playable_cards}")
+                while True:
+                    # Traps the user until input is received
+                    if cc.currentChoice is not None:
+                        # find cc.currentChoice in playable cards
+                        for i in range(len(cc.playable_cards.stack)):
+                            if cc.currentChoice == cc.playable_cards.stack[i]:
+                                played_card = i+1
+                        cc.currentChoice = None
+                    else:
+                        continue
 
-        #         while True:
-        #             # Traps the user until input is received
-        #             played_card = uno.Input("Play a card: ", int)
+                    if played_card > 0 and played_card <= len(cc.playable_cards.stack):
+                        print(f'pc: {played_card}')
+                        # print(f"Card played: {cc.playable_cards.stack[played_card-1].show()}")
+                        if cc.playable_cards.stack[played_card-1].card['colour'] == 'X':
+                            client.colour = uno.colourSwitch()
+                            client.choice = played_card
+                        else:
+                            client.choice = played_card
+                            client.colour = '0'
+                        break
+                    else:
+                        print(f"Please enter a number between 1 and {len(cc.playable_cards.stack)}")
 
-        #             if played_card > 0 and played_card <= len(playable_cards.stack):
-        #                 print(f"Card played: {playable_cards.stack[played_card-1].show()}")
-        #                 if playable_cards.stack[played_card-1].card['colour'] == 'X':
-        #                     client.colour = uno.colourSwitch()
-        #                     client.choice = played_card
-        #                 else:
-        #                     client.choice = played_card
-        #                     client.colour = '0'
-        #                 break
-        #             else:
-        #                 print(f"Please enter a number between 1 and {len(playable_cards.stack)}")
+                cc.playable_cards = None
+            elif client.event[cc.eventID] == 'no_cards':
+                print(f"Your turn {client.playerName}:")
+                print("You have no playable cards")
+                # print(f"Card drawn: {cc.drawn_cards.show()}")
 
-        #     elif client.event[eventID] == 'no_cards':
-        #         print(f"Your turn {client.playerName}:")
-        #         print("You have no playable cards")
-        #         print(f"Card drawn: {drawn_cards.show()}")
+                # print("Press 'enter' to continue")
+                # while True:
+                #     # convert into a separate 'ENTER' function [FIXME]
+                #     x = input()
+                #     if x == '':
+                        # break
+                client.choice = '0'
+                client.colour = 'N'
 
-        #         print("Press 'enter' to continue")
-        #         while True:
-        #             # convert into a separate 'ENTER' function [FIXME]
-        #             x = input()
-        #             if x == '':
-        #                 break
-        #         client.choice = '0'
-        #         client.colour = 'N'
+            elif client.event[cc.eventID] == '+4/+2':
+                print(f"+{len(cc.drawn_cards.stack)} was used on you")
+                print(f"Cards drawn: {cc.drawn_cards.show()}")
 
-        #     elif client.event[eventID] == '+4/+2':
-        #         print(f"+{len(drawn_cards.stack)} was used on you")
-        #         print(f"Cards drawn: {drawn_cards.show()}")
+                print("Press 'enter' to continue")
+                # while True:
+                #     # convert into a separate 'ENTER' function [FIXME]
+                #     x = input()
+                #     if x == '':
+                #         break
+                client.choice = '0'
+                client.colour = 'N'
 
-        #         print("Press 'enter' to continue")
-        #         while True:
-        #             # convert into a separate 'ENTER' function [FIXME]
-        #             x = input()
-        #             if x == '':
-        #                 break
-        #         client.choice = '0'
-        #         client.colour = 'N'
+            elif client.event[cc.eventID] == 'skip':
+                print("Your turn was skipped.")
 
-        #     elif client.event[eventID] == 'skip':
-        #         print("Your turn was skipped.")
-
-        #         print("Press 'enter' to continue")
-        #         while True:
-        #             # convert into a separate 'ENTER' function [FIXME]
-        #             x = input()
-        #             if x == '':
-        #                 break
-        #         client.choice = '0'
-        #         client.colour = 'N'
-        # else:
-        #     client.colour = '0'
-        #     client.choice = '0'
-        #     print("not my turn")
+                print("Press 'enter' to continue")
+                # while True:
+                #     # convert into a separate 'ENTER' function [FIXME]
+                #     x = input()
+                #     if x == '':
+                #         break
+                client.choice = '0'
+                client.colour = 'N'
+        else:
+            client.colour = '0'
+            client.choice = '0'
+            print("not my turn")
 
 
 def start():

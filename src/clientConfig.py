@@ -5,3 +5,5 @@ drawn_cards = None
 playerTurn = None
 winner = None
 chosenColour = None
+playable_cards = None
+currentChoice = None

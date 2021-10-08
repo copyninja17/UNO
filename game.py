@@ -163,43 +163,44 @@ for colour in colours:
     cardsList[colour[0].upper()].append(pygame.image.load(f'assets/textures/cards/{colour}/{colour}Plus2.png').convert_alpha())
     cardsList[colour[0].upper()].append(pygame.image.load(f'assets/textures/cards/{colour}/{colour}Rev.png').convert_alpha())
     cardsList[colour[0].upper()].append(pygame.image.load(f'assets/textures/cards/{colour}/{colour}Skip.png').convert_alpha())
-cardsList['+4'] = pygame.image.load(f'assets/textures/cards/others/X+4.png').convert_alpha()
-cardsList['wild'] = pygame.image.load(f'assets/textures/cards/others/Xwild.png').convert_alpha()
+cardsList['X'] = []
+cardsList['X'].append(pygame.image.load(f'assets/textures/cards/others/X+4.png').convert_alpha())
+cardsList['X'].append(pygame.image.load(f'assets/textures/cards/others/Xwild.png').convert_alpha())
 cardsList['unoBack'] = pygame.image.load(f'assets/textures/cards/others/unoBack.png').convert_alpha()
 
-for colour in colours:
-    cardButtons[colour[0].upper()] = []
-    for num in range(10):
-        # print(f'c = {colour[0].upper()}, n = {num}')
-        cardButtons[colour[0].upper().upper()].append(button.Button(SCREEN_WIDTH/2-cardsList['R'][0].get_width()/2*0.4,
-                                                  SCREEN_HEIGHT/4+cardsList['R'][0].get_height()*0.4,
-                                                  cardsList[colour[0].upper()][num],
-                                                  0.4))
-    cardButtons[colour[0].upper()].append(button.Button(SCREEN_WIDTH/2-cardsList['R'][0].get_width()/2*0.4,
-                                                  SCREEN_HEIGHT/4+cardsList['R'][0].get_height()*0.4,
-                                                  cardsList[colour[0].upper()][10],
-                                                  0.4))
-    cardButtons[colour[0].upper()].append(button.Button(SCREEN_WIDTH/2-cardsList['R'][0].get_width()/2*0.4,
-                                                  SCREEN_HEIGHT/4+cardsList['R'][0].get_height()*0.4,
-                                                  cardsList[colour[0].upper()][11],
-                                                  0.4))
-    cardButtons[colour[0].upper()].append(button.Button(SCREEN_WIDTH/2-cardsList['R'][0].get_width()/2*0.4,
-                                                  SCREEN_HEIGHT/4+cardsList['R'][0].get_height()*0.4,
-                                                  cardsList[colour[0].upper()][12],
-                                                  0.4))
-cardButtons['X'] = []
-cardButtons['X'].append(button.Button(SCREEN_WIDTH/2-cardsList['R'][0].get_width()/2*0.4,
-                                                  SCREEN_HEIGHT/4+cardsList['R'][0].get_height()*0.4,
-                                                  cardsList['+4'],
-                                                  0.4))
-cardButtons['X'].append(button.Button(SCREEN_WIDTH/2-cardsList['R'][0].get_width()/2*0.4,
-                                                  SCREEN_HEIGHT/4+cardsList['R'][0].get_height()*0.4,
-                                                  cardsList['wild'],
-                                                  0.4))
-cardButtons['unoBack'] = (button.Button(SCREEN_WIDTH/2-cardsList['R'][0].get_width()/2*0.4,
-                                                  SCREEN_HEIGHT/4+cardsList['R'][0].get_height()*0.4,
-                                                  cardsList['unoBack'],
-                                                  0.4))
+# for colour in colours:
+#     cardButtons[colour[0].upper()] = []
+#     for num in range(10):
+#         # print(f'c = {colour[0].upper()}, n = {num}')
+#         cardButtons[colour[0].upper()].append(button.Button(SCREEN_WIDTH/2-cardsList['R'][0].get_width()/2*0.4,
+#                                                   SCREEN_HEIGHT/4+cardsList['R'][0].get_height()*0.4,
+#                                                   cardsList[colour[0].upper()][num],
+#                                                   0.4))
+#     cardButtons[colour[0].upper()].append(button.Button(SCREEN_WIDTH/2-cardsList['R'][0].get_width()/2*0.4,
+#                                                   SCREEN_HEIGHT/4+cardsList['R'][0].get_height()*0.4,
+#                                                   cardsList[colour[0].upper()][10],
+#                                                   0.4))
+#     cardButtons[colour[0].upper()].append(button.Button(SCREEN_WIDTH/2-cardsList['R'][0].get_width()/2*0.4,
+#                                                   SCREEN_HEIGHT/4+cardsList['R'][0].get_height()*0.4,
+#                                                   cardsList[colour[0].upper()][11],
+#                                                   0.4))
+#     cardButtons[colour[0].upper()].append(button.Button(SCREEN_WIDTH/2-cardsList['R'][0].get_width()/2*0.4,
+#                                                   SCREEN_HEIGHT/4+cardsList['R'][0].get_height()*0.4,
+#                                                   cardsList[colour[0].upper()][12],
+#                                                   0.4))
+# cardButtons['X'] = []
+# cardButtons['X'].append(button.Button(SCREEN_WIDTH/2-cardsList['R'][0].get_width()/2*0.4,
+#                                                   SCREEN_HEIGHT/4+cardsList['R'][0].get_height()*0.4,
+#                                                   cardsList['X'][0],
+#                                                   0.4))
+# cardButtons['X'].append(button.Button(SCREEN_WIDTH/2-cardsList['R'][0].get_width()/2*0.4,
+#                                                   SCREEN_HEIGHT/4+cardsList['R'][0].get_height()*0.4,
+#                                                   cardsList['X'][1],
+#                                                   0.4))
+# cardButtons['unoBack'] = (button.Button(SCREEN_WIDTH/2-cardsList['R'][0].get_width()/2*0.4,
+#                                                   SCREEN_HEIGHT/4+cardsList['R'][0].get_height()*0.4,
+#                                                   cardsList['unoBack'],
+#                                                   0.4))
 
 #-----------------------------------
 # Game Loop
@@ -256,7 +257,7 @@ while run:
             config.Page = 5
 
     elif config.Page == 5:
-        startGame.display(screen, tableButton, cardButtons)
+        startGame.display(screen, tableButton, cardsList)
 
     if config.waitingTime:
         pygame.time.wait(config.waitingTime)
