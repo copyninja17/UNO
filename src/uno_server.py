@@ -261,6 +261,7 @@ def threaded_client(conn):
                 break
             else:
                 if ":" in reply:  # if client requests game data
+                    print(name)
                     config.myReplies[name]['choice'], config.myReplies[name]['colour'] = parse(reply)
                     if config.myReplies[name]['choice'] != '0':
                         config.myStorage[name]['playerTurn'] = '0'

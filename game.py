@@ -1,9 +1,10 @@
+from typing import OrderedDict
 import pygame
 from src import button
-import subprocess, sys
 import pygame_textinput as pti
-from src import config
+from src import config, clientData
 from pages import hostPrompt, enterRoomSize, serverAddress, startGame
+from src import clientConfig as cc
 
 pygame.init()
 
@@ -133,12 +134,72 @@ textinputName = pti.TextInputVisualizer(manager=nameInputManager, font_object=mc
 #-----------------------------------
 # enter name
 #-----------------------------------
+
 waitinglobbyImg = pygame.image.load('assets/textures/waitinglobby.png').convert_alpha()
 waitinglobbyButton = button.Button(SCREEN_WIDTH/2-waitinglobbyImg.get_width()/2*0.4,
                                    SCREEN_HEIGHT/4,
                                    waitinglobbyImg,
                                    0.4)
 
+
+#-----------------------------------
+# game room
+#-----------------------------------
+
+tableImg = pygame.image.load('assets/textures/table.png').convert_alpha()
+tableButton = button.Button(SCREEN_WIDTH/2 - tableImg.get_width()/2*0.25,
+                                SCREEN_HEIGHT/2 - tableImg.get_height()/2*0.25,
+                                tableImg,
+                                0.25)
+
+colours = ['red', 'green', 'blue', 'yellow']
+cardsList = {}
+cardButtons = {}
+
+for colour in colours:
+    cardsList[colour[0].upper()] = []
+    for num in range(10):
+        cardsList[colour[0].upper()].append(pygame.image.load(f'assets/textures/cards/{colour}/{colour}{num}.png').convert_alpha())
+    cardsList[colour[0].upper()].append(pygame.image.load(f'assets/textures/cards/{colour}/{colour}Plus2.png').convert_alpha())
+    cardsList[colour[0].upper()].append(pygame.image.load(f'assets/textures/cards/{colour}/{colour}Rev.png').convert_alpha())
+    cardsList[colour[0].upper()].append(pygame.image.load(f'assets/textures/cards/{colour}/{colour}Skip.png').convert_alpha())
+cardsList['+4'] = pygame.image.load(f'assets/textures/cards/others/X+4.png').convert_alpha()
+cardsList['wild'] = pygame.image.load(f'assets/textures/cards/others/Xwild.png').convert_alpha()
+cardsList['unoBack'] = pygame.image.load(f'assets/textures/cards/others/unoBack.png').convert_alpha()
+
+for colour in colours:
+    cardButtons[colour[0].upper()] = []
+    for num in range(10):
+        # print(f'c = {colour[0].upper()}, n = {num}')
+        cardButtons[colour[0].upper().upper()].append(button.Button(SCREEN_WIDTH/2-cardsList['R'][0].get_width()/2*0.4,
+                                                  SCREEN_HEIGHT/4+cardsList['R'][0].get_height()*0.4,
+                                                  cardsList[colour[0].upper()][num],
+                                                  0.4))
+    cardButtons[colour[0].upper()].append(button.Button(SCREEN_WIDTH/2-cardsList['R'][0].get_width()/2*0.4,
+                                                  SCREEN_HEIGHT/4+cardsList['R'][0].get_height()*0.4,
+                                                  cardsList[colour[0].upper()][10],
+                                                  0.4))
+    cardButtons[colour[0].upper()].append(button.Button(SCREEN_WIDTH/2-cardsList['R'][0].get_width()/2*0.4,
+                                                  SCREEN_HEIGHT/4+cardsList['R'][0].get_height()*0.4,
+                                                  cardsList[colour[0].upper()][11],
+                                                  0.4))
+    cardButtons[colour[0].upper()].append(button.Button(SCREEN_WIDTH/2-cardsList['R'][0].get_width()/2*0.4,
+                                                  SCREEN_HEIGHT/4+cardsList['R'][0].get_height()*0.4,
+                                                  cardsList[colour[0].upper()][12],
+                                                  0.4))
+cardButtons['X'] = []
+cardButtons['X'].append(button.Button(SCREEN_WIDTH/2-cardsList['R'][0].get_width()/2*0.4,
+                                                  SCREEN_HEIGHT/4+cardsList['R'][0].get_height()*0.4,
+                                                  cardsList['+4'],
+                                                  0.4))
+cardButtons['X'].append(button.Button(SCREEN_WIDTH/2-cardsList['R'][0].get_width()/2*0.4,
+                                                  SCREEN_HEIGHT/4+cardsList['R'][0].get_height()*0.4,
+                                                  cardsList['wild'],
+                                                  0.4))
+cardButtons['unoBack'] = (button.Button(SCREEN_WIDTH/2-cardsList['R'][0].get_width()/2*0.4,
+                                                  SCREEN_HEIGHT/4+cardsList['R'][0].get_height()*0.4,
+                                                  cardsList['unoBack'],
+                                                  0.4))
 
 #-----------------------------------
 # Game Loop
@@ -153,7 +214,7 @@ while run:
     events = pygame.event.get()
     
     # back button
-    if config.Page and backButton.draw(screen):
+    if config.Page and backButton.draw(screen) and config.Page <5:
         if config.Page == 3:
             config.Page = config.lastPage
             config.lastPage = 0
@@ -191,7 +252,11 @@ while run:
 
     elif config.Page == 4:
         waitinglobbyButton.draw(screen)
-        # wait for server to start
+        if cc.top_card:
+            config.Page = 5
+
+    elif config.Page == 5:
+        startGame.display(screen, tableButton, cardButtons)
 
     if config.waitingTime:
         pygame.time.wait(config.waitingTime)
@@ -212,13 +277,13 @@ while run:
                 config.buttonUpdate = 0
 
         if event.type == pygame.KEYDOWN and event.key == pygame.K_RETURN:
-
             if config.Page == 3:
                 config.playerName = textinputName.value
                 print(f"Name = {config.playerName}")
                 config.Page = 4
-                textinputName.value = ''
-                startGame.start()
+                # textinputName.value = ''
+                clientData.start()
+                print("aage")
 
             elif config.Page == 2:
                 config.settings = textinputCustom.value

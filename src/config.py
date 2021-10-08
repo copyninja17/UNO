@@ -52,3 +52,5 @@ lastPage = None
 waitingTime = 0
 
 buttonFlip = 1
+
+counter = 0
