@@ -1,5 +1,9 @@
-import uno_module as uno
-from bridge import Network
+try:    
+    import uno_module as uno
+    from bridge import Network
+except:
+    from src import uno_module as uno
+    from src.bridge import Network
 import os
 import subprocess, sys
 

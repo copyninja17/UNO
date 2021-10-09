@@ -1,9 +1,10 @@
+from typing import OrderedDict
 import pygame
 from src import button
-import subprocess, sys
 import pygame_textinput as pti
-from src import config
+from src import config, clientData
 from pages import hostPrompt, enterRoomSize, serverAddress, startGame
+from src import clientConfig as cc
 
 pygame.init()
 
@@ -43,7 +44,7 @@ joinButton = button.Button(450, 200, joinRoom, 0.4)
 #-----------------------------------
 
 # loading images
-sample_button = pygame.image.load('assets/textures/2.png').convert_alpha()
+sample_button = pygame.image.load('assets/textures/buttons/2.png').convert_alpha()
 enterRoomSize_ = pygame.image.load('assets/textures/roomsize.png').convert_alpha()
 
 # Creating butttons
@@ -66,9 +67,9 @@ count = 2
 for i in range(3):
     for j in range(3):
         roomSizeButtons[i].append(pygame.image.load(
-                                  f'assets/textures/{count}.png').convert_alpha())
+                                  f'assets/textures/buttons/{count}.png').convert_alpha())
         roomSizeButtonsFinal[i].append(pygame.image.load(
-                                       f'assets/textures/{count}final.png').convert_alpha())
+                                       f'assets/textures/buttons/{count}final.png').convert_alpha())
         roomSizeNames[i].append(str(count))
         count += 1
 
@@ -133,11 +134,47 @@ textinputName = pti.TextInputVisualizer(manager=nameInputManager, font_object=mc
 #-----------------------------------
 # enter name
 #-----------------------------------
+
 waitinglobbyImg = pygame.image.load('assets/textures/waitinglobby.png').convert_alpha()
 waitinglobbyButton = button.Button(SCREEN_WIDTH/2-waitinglobbyImg.get_width()/2*0.4,
                                    SCREEN_HEIGHT/4,
                                    waitinglobbyImg,
                                    0.4)
+
+
+#-----------------------------------
+# game room
+#-----------------------------------
+
+tableImg = pygame.image.load('assets/textures/table.png').convert_alpha()
+tableButton = button.Button(SCREEN_WIDTH/2 - tableImg.get_width()/2*0.25,
+                                SCREEN_HEIGHT/2 - tableImg.get_height()/2*0.25,
+                                tableImg,
+                                0.25)
+
+colours = ['red', 'green', 'blue', 'yellow']
+cardsList = {}
+cardButtons = {}
+
+for colour in colours:
+    cardsList[colour[0].upper()] = []
+    for num in range(10):
+        cardsList[colour[0].upper()].append(pygame.image.load(f'assets/textures/cards/{colour}/{colour}{num}.png').convert_alpha())
+    cardsList[colour[0].upper()].append(pygame.image.load(f'assets/textures/cards/{colour}/{colour}Plus2.png').convert_alpha())
+    cardsList[colour[0].upper()].append(pygame.image.load(f'assets/textures/cards/{colour}/{colour}Rev.png').convert_alpha())
+    cardsList[colour[0].upper()].append(pygame.image.load(f'assets/textures/cards/{colour}/{colour}Skip.png').convert_alpha())
+cardsList['X'] = []
+cardsList['X'].append(pygame.image.load(f'assets/textures/cards/others/X+4.png').convert_alpha())
+cardsList['X'].append(pygame.image.load(f'assets/textures/cards/others/Xwild.png').convert_alpha())
+cardsList['unoBack'] = pygame.image.load(f'assets/textures/cards/others/unoBack.png').convert_alpha()
+
+gameplayImg = {}
+gameplayImg['yourTurn'] = pygame.image.load(f'assets/textures/yourTurn.png').convert_alpha()
+gameplayImg['notYourTurn'] = pygame.image.load(f'assets/textures/notYourTurn.png').convert_alpha()
+gameplayImg['ok'] = pygame.image.load(f'assets/textures/ok.png').convert_alpha()
+gameplayImg['pick'] = {}
+for colour in colours:
+    gameplayImg['pick'][colour] = pygame.image.load(f'assets/textures/pick{colour}.png').convert_alpha()
 
 
 #-----------------------------------
@@ -153,7 +190,7 @@ while run:
     events = pygame.event.get()
     
     # back button
-    if config.Page and backButton.draw(screen):
+    if config.Page and backButton.draw(screen) and config.Page <5:
         if config.Page == 3:
             config.Page = config.lastPage
             config.lastPage = 0
@@ -191,7 +228,11 @@ while run:
 
     elif config.Page == 4:
         waitinglobbyButton.draw(screen)
-        # wait for server to start
+        if cc.top_card:
+            config.Page = 5
+
+    elif config.Page == 5:
+        startGame.display(screen, tableButton, cardsList, gameplayImg)
 
     if config.waitingTime:
         pygame.time.wait(config.waitingTime)
@@ -212,13 +253,13 @@ while run:
                 config.buttonUpdate = 0
 
         if event.type == pygame.KEYDOWN and event.key == pygame.K_RETURN:
-
             if config.Page == 3:
                 config.playerName = textinputName.value
                 print(f"Name = {config.playerName}")
                 config.Page = 4
-                textinputName.value = ''
-                startGame.start()
+                # textinputName.value = ''
+                clientData.start()
+                print("aage")
 
             elif config.Page == 2:
                 config.settings = textinputCustom.value
