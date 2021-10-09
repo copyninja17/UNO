@@ -7,3 +7,5 @@ winner = None
 chosenColour = None
 playable_cards = None
 currentChoice = None
+okPrompt = None
+colourChange = None

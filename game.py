@@ -168,39 +168,14 @@ cardsList['X'].append(pygame.image.load(f'assets/textures/cards/others/X+4.png')
 cardsList['X'].append(pygame.image.load(f'assets/textures/cards/others/Xwild.png').convert_alpha())
 cardsList['unoBack'] = pygame.image.load(f'assets/textures/cards/others/unoBack.png').convert_alpha()
 
-# for colour in colours:
-#     cardButtons[colour[0].upper()] = []
-#     for num in range(10):
-#         # print(f'c = {colour[0].upper()}, n = {num}')
-#         cardButtons[colour[0].upper()].append(button.Button(SCREEN_WIDTH/2-cardsList['R'][0].get_width()/2*0.4,
-#                                                   SCREEN_HEIGHT/4+cardsList['R'][0].get_height()*0.4,
-#                                                   cardsList[colour[0].upper()][num],
-#                                                   0.4))
-#     cardButtons[colour[0].upper()].append(button.Button(SCREEN_WIDTH/2-cardsList['R'][0].get_width()/2*0.4,
-#                                                   SCREEN_HEIGHT/4+cardsList['R'][0].get_height()*0.4,
-#                                                   cardsList[colour[0].upper()][10],
-#                                                   0.4))
-#     cardButtons[colour[0].upper()].append(button.Button(SCREEN_WIDTH/2-cardsList['R'][0].get_width()/2*0.4,
-#                                                   SCREEN_HEIGHT/4+cardsList['R'][0].get_height()*0.4,
-#                                                   cardsList[colour[0].upper()][11],
-#                                                   0.4))
-#     cardButtons[colour[0].upper()].append(button.Button(SCREEN_WIDTH/2-cardsList['R'][0].get_width()/2*0.4,
-#                                                   SCREEN_HEIGHT/4+cardsList['R'][0].get_height()*0.4,
-#                                                   cardsList[colour[0].upper()][12],
-#                                                   0.4))
-# cardButtons['X'] = []
-# cardButtons['X'].append(button.Button(SCREEN_WIDTH/2-cardsList['R'][0].get_width()/2*0.4,
-#                                                   SCREEN_HEIGHT/4+cardsList['R'][0].get_height()*0.4,
-#                                                   cardsList['X'][0],
-#                                                   0.4))
-# cardButtons['X'].append(button.Button(SCREEN_WIDTH/2-cardsList['R'][0].get_width()/2*0.4,
-#                                                   SCREEN_HEIGHT/4+cardsList['R'][0].get_height()*0.4,
-#                                                   cardsList['X'][1],
-#                                                   0.4))
-# cardButtons['unoBack'] = (button.Button(SCREEN_WIDTH/2-cardsList['R'][0].get_width()/2*0.4,
-#                                                   SCREEN_HEIGHT/4+cardsList['R'][0].get_height()*0.4,
-#                                                   cardsList['unoBack'],
-#                                                   0.4))
+gameplayImg = {}
+gameplayImg['yourTurn'] = pygame.image.load(f'assets/textures/yourTurn.png').convert_alpha()
+gameplayImg['notYourTurn'] = pygame.image.load(f'assets/textures/notYourTurn.png').convert_alpha()
+gameplayImg['ok'] = pygame.image.load(f'assets/textures/ok.png').convert_alpha()
+gameplayImg['pick'] = {}
+for colour in colours:
+    gameplayImg['pick'][colour] = pygame.image.load(f'assets/textures/pick{colour}.png').convert_alpha()
+
 
 #-----------------------------------
 # Game Loop
@@ -257,7 +232,7 @@ while run:
             config.Page = 5
 
     elif config.Page == 5:
-        startGame.display(screen, tableButton, cardsList)
+        startGame.display(screen, tableButton, cardsList, gameplayImg)
 
     if config.waitingTime:
         pygame.time.wait(config.waitingTime)

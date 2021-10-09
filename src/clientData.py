@@ -1,9 +1,7 @@
-from pages.startGame import printHand
 from src import config
 from src.bridge import Network
 from src import uno_module as uno
-import os, subprocess, sys
-import multiprocessing as mp
+import subprocess, sys
 import threading
 from src import clientConfig as cc
 
@@ -65,7 +63,6 @@ class Client:
 
                 chosenColour = data.split(":")[6]
 
-                # return cc.top_card, cc.player_hand, cc.eventID, cc.drawn_cards, cc.playerTurn, cc.winner, cc.chosenColour
                 return top_card, player_hand, eventID, drawn_cards, playerTurn, winner, chosenColour
 
             except ValueError or TypeError or IndexError:
@@ -88,19 +85,6 @@ class Client:
             return reply
 
 
-def run_once(f):
-    '''
-    lets a function run only once
-    '''
-    def wrapper(*args, **kwargs):
-        if not wrapper.has_run:
-            wrapper.has_run = True
-            return f(*args, **kwargs)
-    wrapper.has_run = False
-    return wrapper
-
-
-# @run_once
 def display(addrPort):
     address, port = addrPort.split(':')
 
@@ -139,8 +123,8 @@ def display(addrPort):
         print(f"Your cards: {cc.player_hand.show()}")
         
         if cc.playerTurn is True:
+
             if client.event[cc.eventID] == 'regular':
-        #         print(f"\nYour turn {client.playerName}:\n")
                 played_card = 0
                 fake_hand = uno.Stack()
                 fake_hand.add(cc.player_hand.stack)
@@ -161,7 +145,14 @@ def display(addrPort):
                         print(f'pc: {played_card}')
                         # print(f"Card played: {cc.playable_cards.stack[played_card-1].show()}")
                         if cc.playable_cards.stack[played_card-1].card['colour'] == 'X':
-                            client.colour = uno.colourSwitch()
+                            cc.colourChange = 0
+                            while True:
+                                if cc.colourChange in ['R','B','G','Y']:
+                                    client.colour = cc.colourChange
+                                    cc.colourChange = None
+                                    break
+
+                            # client.colour = cc.colourChange
                             client.choice = played_card
                         else:
                             client.choice = played_card
@@ -174,14 +165,12 @@ def display(addrPort):
             elif client.event[cc.eventID] == 'no_cards':
                 print(f"Your turn {client.playerName}:")
                 print("You have no playable cards")
-                # print(f"Card drawn: {cc.drawn_cards.show()}")
+                cc.okPrompt = 0
+                while True:
+                    if cc.okPrompt == 1:
+                        cc.okPrompt = None
+                        break
 
-                # print("Press 'enter' to continue")
-                # while True:
-                #     # convert into a separate 'ENTER' function [FIXME]
-                #     x = input()
-                #     if x == '':
-                        # break
                 client.choice = '0'
                 client.colour = 'N'
 
@@ -189,24 +178,24 @@ def display(addrPort):
                 print(f"+{len(cc.drawn_cards.stack)} was used on you")
                 print(f"Cards drawn: {cc.drawn_cards.show()}")
 
-                print("Press 'enter' to continue")
-                # while True:
-                #     # convert into a separate 'ENTER' function [FIXME]
-                #     x = input()
-                #     if x == '':
-                #         break
+                cc.okPrompt = 0
+                while True:
+                    if cc.okPrompt == 1:
+                        cc.okPrompt = None
+                        break
+
                 client.choice = '0'
                 client.colour = 'N'
 
             elif client.event[cc.eventID] == 'skip':
                 print("Your turn was skipped.")
 
-                print("Press 'enter' to continue")
-                # while True:
-                #     # convert into a separate 'ENTER' function [FIXME]
-                #     x = input()
-                #     if x == '':
-                #         break
+                cc.okPrompt = 0
+                while True:
+                    if cc.okPrompt == 1:
+                        cc.okPrompt = None
+                        break
+
                 client.choice = '0'
                 client.colour = 'N'
         else:

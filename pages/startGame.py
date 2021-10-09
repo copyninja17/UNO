@@ -37,14 +37,35 @@ def cardDisplay(screen, cardsList, currCard, x=-1, y=-1):
     # make a new button
 
 def printHand(screen,cardsList):
-    numCards = len(cc.player_hand.stack)
-    for i in range(numCards):
-        cardDisplay(screen, cardsList, cc.player_hand.stack[i], x=(10 + cardsList['R'][0].get_width()*0.4)*(i+1), y=SCREEN_HEIGHT-100)
-        
+    try:
+        numCards = len(cc.player_hand.stack)
+        for i in range(numCards):
+            cardDisplay(screen, cardsList, cc.player_hand.stack[i], x=(10 + cardsList['R'][0].get_width()*0.4)*(i+1), y=SCREEN_HEIGHT-100)
+    except:
+        pass
 
 
-def display(screen, tableButton, cardsList):
+
+def display(screen, tableButton, cardsList, gameplayImg):
     tableButton.draw(screen)
+    # if cc.winner == 'None':
     cardDisplay(screen, cardsList, cc.top_card)
     printHand(screen, cardsList)
-    
+    if cc.playerTurn is True:
+        button.Button(10, 10, gameplayImg['yourTurn'], 0.4).draw(screen)
+    else:
+        button.Button(10, 10, gameplayImg['notYourTurn'], 0.4).draw(screen)
+
+    if cc.okPrompt == 0:
+        if button.Button(SCREEN_WIDTH-gameplayImg['ok'].get_width()*0.25 -10, SCREEN_HEIGHT/2-gameplayImg['ok'].get_height()/2*0.25, gameplayImg['ok'], 0.25).draw(screen):
+            cc.okPrompt = 1
+
+    if cc.colourChange == 0:
+        if button.Button(SCREEN_WIDTH-2*gameplayImg['pick']['red'].get_width()*0.4 -10, SCREEN_HEIGHT/2-gameplayImg['pick']['red'].get_height()/2*0.4, gameplayImg['pick']['red'], 0.4).draw(screen):
+            cc.colourChange = 'R'
+        elif button.Button(SCREEN_WIDTH-gameplayImg['pick']['blue'].get_width()*0.4 -10, SCREEN_HEIGHT/2-gameplayImg['pick']['blue'].get_height()/2*0.4, gameplayImg['pick']['blue'], 0.4).draw(screen):
+            cc.colourChange = 'B'
+        elif button.Button(SCREEN_WIDTH-2*gameplayImg['pick']['yellow'].get_width()*0.4 -10, SCREEN_HEIGHT/2+gameplayImg['pick']['yellow'].get_height()/2*0.4, gameplayImg['pick']['yellow'], 0.4).draw(screen):
+            cc.colourChange = 'Y'
+        elif button.Button(SCREEN_WIDTH-gameplayImg['pick']['green'].get_width()*0.4 -10, SCREEN_HEIGHT/2+gameplayImg['pick']['green'].get_height()/2*0.4, gameplayImg['pick']['green'], 0.4).draw(screen):
+            cc.colourChange = 'G'
