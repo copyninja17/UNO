@@ -152,7 +152,6 @@ def display(addrPort):
                                     cc.colourChange = None
                                     break
 
-                            # client.colour = cc.colourChange
                             client.choice = played_card
                         else:
                             client.choice = played_card
