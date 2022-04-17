@@ -9,11 +9,11 @@ We are bringing this multiplayer card game to PC with support for more than 4 pl
 ### Features
 - Playable over LAN or internet using [ngrok](https://ngrok.com/)
 - Game ends when any player has 0 cards
-- ngrok button disabled
+
 
 ### Bugs
 - AI player temporarily removed
-- Disconnecting mid match crashes game for other players
+- ngrok button disabled
 
 ### Upcoming Features
 - Party rules
