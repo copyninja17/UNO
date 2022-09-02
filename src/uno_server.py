@@ -1,11 +1,17 @@
+'''
+Multithreaded Server for UNO.
+
+Handles all transactions and calculations related to players and cards.
+'''
+
 import uno_module as uno
-import os
-import uno_ai as ai
+import config
+
 import socket
 from _thread import *
 import threading
-import config
 import sys
+
 
 # local declarations
 currentId = "0"
@@ -38,12 +44,20 @@ def parse(message):
     colour = message.split(":")[1].split(",")[1]
     return choice, colour
 
+
 def encode(dct):
     '''
     converts dct into sendable string
     '''
-    string = str(dct['topCard']) + ":" + str(dct['hand']) + ":" + str(dct['eventID']) + ":" + str(dct['drawnCards']) + ":" + str(dct['playerTurn']) + ":" + str(dct['winner']) + ":" + str(dct['chosenColour'])
+    string = (str(dct['topCard']) + ":" + 
+              str(dct['hand']) + ":" + 
+              str(dct['eventID']) + ":" + 
+              str(dct['drawnCards']) + ":" + 
+              str(dct['playerTurn']) + ":" + 
+              str(dct['winner']) + ":" + 
+              str(dct['chosenColour']))
     return string
+
 
 def run_once(f):
     '''
@@ -70,13 +84,12 @@ def database(name='0', eventID=0, drawnCards='00'):
             eventID = 0
             drawnCards = '00'
         dct[config.myPlayers[i]['name']] = {'topCard': config.myDiscard_pile.stack[-1].conv(),
-                                            'hand':config.myPlayers[i]['hand'].conv(),
+                                            'hand': config.myPlayers[i]['hand'].conv(),
                                             'eventID': eventID,
                                             'playerTurn': playerTurn,
                                             'drawnCards': drawnCards,
                                             'winner': config.Winner,
-                                            'chosenColour': config.assumedColour
-                                            }
+                                            'chosenColour': config.assumedColour}
     return dct
 
 
@@ -106,7 +119,7 @@ def prepare():
 
     # creating config.myReplies
     for i in config.myPlayerList:
-        sample_dict = {'choice':'0', 'colour':'0'}
+        sample_dict = {'choice': '0', 'colour': '0'}
         config.myReplies[i] = sample_dict
     print("config.myReplies ready")
 
@@ -141,40 +154,48 @@ def threaded_server():
             prepare()
         else:
             continue
-        
+
         print(f"it's {config.myPlayers[0]['name']} turn")
         if config.actionEffect == False:
             copied_hand = uno.Stack()
             lst = list(config.myPlayers[0]['hand'].stack)
             copied_hand.add(lst)
 
-            playable_cards = uno.isPlayable(config.myDiscard_pile.stack[-1], copied_hand, config.assumedColour)
+            playable_cards = uno.isPlayable(
+                config.myDiscard_pile.stack[-1], copied_hand, config.assumedColour)
 
             if playable_cards != 'None':
                 print(f"{config.myPlayers[0]['name']} has playable cards")
                 config.myStorage = database(config.myPlayers[0]['name'], 1)
                 while True:
                     # trapping until input is recieved
-                    choice = int(config.myReplies[config.myPlayers[0]['name']]['choice'])
+                    choice = int(
+                        config.myReplies[config.myPlayers[0]['name']]['choice'])
                     if choice != 0:
                         print(f"{config.myPlayers[0]['name']} HAS CHOSEN")
-                        config.assumedColour = config.myReplies[config.myPlayers[0]['name']]['colour']
+                        config.assumedColour = config.myReplies[config.myPlayers[0]
+                                                                ['name']]['colour']
                         played_card = choice-1
-                        config.myDiscard_pile.add(playable_cards.deal(0, played_card))
+                        config.myDiscard_pile.add(
+                            playable_cards.deal(0, played_card))
                         copied_hand.add(playable_cards.stack)
                         config.myPlayers[0]['hand'].clear()
-                        config.myPlayers[0]['hand'].add(copied_hand.stack)  # at this point we have successfully played the card
-                        print(f"remaining hand: {config.myPlayers[0]['hand'].show()}")
-                        print(f"hand length = {len(config.myPlayers[0]['hand'].stack)}")
-                        
-                        if uno.isAction(config.myDiscard_pile.stack[-1]) != 'None' and config.myDiscard_pile.stack[-1].card['val'] != 'wild':
-                            config.actionEffect = True
+                        # at this point we have successfully played the card
+                        config.myPlayers[0]['hand'].add(copied_hand.stack)
+                        print(
+                            f"remaining hand: {config.myPlayers[0]['hand'].show()}")
+                        print(
+                            f"hand length = {len(config.myPlayers[0]['hand'].stack)}")
 
+                        if (uno.isAction(config.myDiscard_pile.stack[-1]) != 'None' and 
+                            config.myDiscard_pile.stack[-1].card['val'] != 'wild'):
+                            config.actionEffect = True
 
                         if len(config.myPlayers[0]['hand'].stack) == 0:
                             print(f"Winner is {config.myPlayers[0]['name']}!!")
                             config.Winner = str(config.myPlayers[0]['name'])
-                            config.myPlayers[0]['hand'].add(config.myDiscard_pile.deal(0,0))
+                            config.myPlayers[0]['hand'].add(
+                                config.myDiscard_pile.deal(0, 0))
                         break
 
             else:
@@ -182,15 +203,16 @@ def threaded_server():
                 print(f"{config.myPlayers[0]['name']} has NO playable cards")
                 config.myPlayers[0]['hand'].add(Deal(1))
 
-                config.myStorage = database(config.myPlayers[0]['name'], 2, config.myPlayers[0]['hand'].stack[-1].conv())
+                config.myStorage = database(config.myPlayers[0]['name'], 2, 
+                                            config.myPlayers[0]['hand'].stack[-1].conv())
 
                 while True:
                     # trapping until input is recieved
                     colour = config.myReplies[config.myPlayers[0]['name']]['colour']
-                    if colour =='N': # N = Nil[client has received data]
+                    if colour == 'N':  # N = Nil[client has received data]
                         print(f"{config.myPlayers[0]['name']} HAS RECEIVED")
                         break
-            
+
             if uno.isAction(config.myDiscard_pile.stack[-1]) == 'rev':
                 config.actionEffect = False
                 config.myPlayers.reverse()
@@ -199,15 +221,18 @@ def threaded_server():
             config.myPlayers.append(config.myPlayers.pop(0))
 
         else:
-            print(f"{config.myPlayers[0]['name']} is facing an action situation")
+            print(
+                f"{config.myPlayers[0]['name']} is facing an action situation")
+
             # write action code
             if uno.isAction(config.myDiscard_pile.stack[-1]) == 'skp':
                 config.actionEffect = False
                 config.myStorage = database(config.myPlayers[0]['name'], 5)
+
                 while True:
                     # trapping until input is recieved
                     colour = config.myReplies[config.myPlayers[0]['name']]['colour']
-                    if colour =='N': # N = Nil[client has received data]
+                    if colour == 'N':  # N = Nil[client has received data]
                         print(f"{config.myPlayers[0]['name']} HAS RECEIVED")
                         break
                 config.myPlayers.append(config.myPlayers.pop(0))
@@ -215,29 +240,36 @@ def threaded_server():
             elif uno.isAction(config.myDiscard_pile.stack[-1]) == '+2':
                 config.actionEffect = False
                 config.myPlayers[0]['hand'].add(Deal(2))
-                drawn_cards = config.myPlayers[0]['hand'].stack[-1].conv() + "," + config.myPlayers[0]['hand'].stack[-2].conv()
-                config.myStorage = database(config.myPlayers[0]['name'], 3, drawn_cards)
+                drawn_cards = (config.myPlayers[0]['hand'].stack[-1].conv() + "," + 
+                               config.myPlayers[0]['hand'].stack[-2].conv())
+                config.myStorage = database(config.myPlayers[0]['name'], 3, 
+                                            drawn_cards)
                 while True:
                     # trapping until input is recieved
                     colour = config.myReplies[config.myPlayers[0]['name']]['colour']
-                    if colour =='N': # N = Nil[client has received data]
+                    if colour == 'N':  # N = Nil[client has received data]
                         print(f"{config.myPlayers[0]['name']} HAS RECEIVED")
                         break
                 config.myPlayers.append(config.myPlayers.pop(0))
-            
+
             elif uno.isAction(config.myDiscard_pile.stack[-1]) == '+4':
                 config.actionEffect = False
                 config.myPlayers[0]['hand'].add(Deal(4))
-                drawn_cards = config.myPlayers[0]['hand'].stack[-1].conv() + "," + config.myPlayers[0]['hand'].stack[-2].conv() + "," + config.myPlayers[0]['hand'].stack[-3].conv() + "," + config.myPlayers[0]['hand'].stack[-4].conv()
-                config.myStorage = database(config.myPlayers[0]['name'], 3, drawn_cards)
+                drawn_cards = (config.myPlayers[0]['hand'].stack[-1].conv() + "," + 
+                               config.myPlayers[0]['hand'].stack[-2].conv() + "," + 
+                               config.myPlayers[0]['hand'].stack[-3].conv() + "," + 
+                               config.myPlayers[0]['hand'].stack[-4].conv())
+                config.myStorage = database(
+                    config.myPlayers[0]['name'], 3, drawn_cards)
                 while True:
                     # trapping until input is recieved
-                    colour = config.myReplies[config.myPlayers[0]['name']]['colour']
-                    if colour =='N': # N = Nil[client has received data]
+                    colour = config.myReplies[config.myPlayers[0]
+                                              ['name']]['colour']
+                    if colour == 'N':  # N = Nil[client has received data]
                         print(f"{config.myPlayers[0]['name']} HAS RECEIVED")
                         break
                 config.myPlayers.append(config.myPlayers.pop(0))
-        
+
 
 th = threading.Thread(target=threaded_server)
 th.start()
@@ -262,7 +294,8 @@ def threaded_client(conn):
             else:
                 if ":" in reply:  # if client requests game data
                     print(name)
-                    config.myReplies[name]['choice'], config.myReplies[name]['colour'] = parse(reply)
+                    config.myReplies[name]['choice'], config.myReplies[name]['colour'] = parse(
+                        reply)
                     if config.myReplies[name]['choice'] != '0':
                         config.myStorage[name]['playerTurn'] = '0'
                         config.myStorage[name]['eventID'] = '0'
@@ -275,12 +308,14 @@ def threaded_client(conn):
                     config.myPlayerList.append(reply)
                     name = reply
                     while True:  # trap until all Players join
-                        if (len(config.myPlayerList) == roomSize) and (config.myPreparations_complete == True):
+                        if ((len(config.myPlayerList) == roomSize) and 
+                            config.myPreparations_complete):
                             reply = ",".join(config.myPlayerList)
                             print(f"Sending to : " + reply)
                             break
                         else:
-                            print(f"config.myPlayers joined({len(config.myPlayerList)}/{roomSize})")
+                            print(
+                                f"config.myPlayers joined({len(config.myPlayerList)}/{roomSize})")
                             print("Waiting...")
                     print(f"Sending to {name}: {reply}")
 

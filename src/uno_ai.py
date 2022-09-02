@@ -1,3 +1,9 @@
+'''
+THIS FILE IS CURRENTLY NOT IN USE.
+
+This is a random card selector.
+'''
+
 import random
 
 colours = ['R', 'B', 'G', 'Y']

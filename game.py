@@ -1,10 +1,14 @@
-from typing import OrderedDict
 import pygame
+import platform
+
 from src import button
 import pygame_textinput as pti
-from src import config, clientData
+from src import config, uno_client
 from pages import hostPrompt, enterRoomSize, serverAddress, startGame
 from src import clientConfig as cc
+
+
+config.platform = platform.system()
 
 pygame.init()
 
@@ -22,30 +26,33 @@ clock = pygame.time.Clock()
 screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
 pygame.display.set_caption('UNO')
 
-#-----------------------------------
+# -----------------------------------
 # Back Button
-#----------------------------------- 
+# -----------------------------------
 backImg = pygame.image.load('assets/textures/back.png').convert_alpha()
-backButton = button.Button(10,10, backImg, 0.07)
+backButton = button.Button(10, 10, backImg, 0.07)
 
 
-#-----------------------------------
+# -----------------------------------
 # Host Prompt
-#-----------------------------------
-createRoom = pygame.image.load('assets/textures/createroom.png').convert_alpha()
+# -----------------------------------
+createRoom = pygame.image.load(
+    'assets/textures/createroom.png').convert_alpha()
 joinRoom = pygame.image.load('assets/textures/joinroom.png').convert_alpha()
 
 createButton = button.Button(100, 200, createRoom, 0.4)
 joinButton = button.Button(450, 200, joinRoom, 0.4)
 
 
-#-----------------------------------
+# -----------------------------------
 # Room size
-#-----------------------------------
+# -----------------------------------
 
 # loading images
-sample_button = pygame.image.load('assets/textures/buttons/2.png').convert_alpha()
-enterRoomSize_ = pygame.image.load('assets/textures/roomsize.png').convert_alpha()
+sample_button = pygame.image.load(
+    'assets/textures/buttons/2.png').convert_alpha()
+enterRoomSize_ = pygame.image.load(
+    'assets/textures/roomsize.png').convert_alpha()
 
 # Creating butttons
 enterRoomSizeHeader = button.Button(SCREEN_WIDTH/2-(enterRoomSize_.get_width()/2*0.4),
@@ -58,9 +65,9 @@ roomSizeButtonsFinal = [[] for _ in range(3)]
 roomSizeNames = [[] for _ in range(3)]
 
 
-#-----------------------------------
+# -----------------------------------
 # Room size
-#-----------------------------------
+# -----------------------------------
 
 # making room buttons
 count = 2
@@ -73,7 +80,7 @@ for i in range(3):
         roomSizeNames[i].append(str(count))
         count += 1
 
-w,h = -1.5*sample_button.get_width()*0.45, 0
+w, h = -1.5*sample_button.get_width()*0.45, 0
 
 for i in range(3):
     for j in range(3):
@@ -86,15 +93,16 @@ for i in range(3):
                                                    roomSizeButtonsFinal[i][j],
                                                    0.4)
         w += sample_button.get_width()*0.45
-        
-    w =- 1.5*sample_button.get_width()*0.45
+
+    w = - 1.5*sample_button.get_width()*0.45
     h += sample_button.get_height()*0.45
 
 
-#-----------------------------------
+# -----------------------------------
 # Server address
-#-----------------------------------
-serverAddressImg = pygame.image.load('assets/textures/serverAddress.png').convert_alpha()
+# -----------------------------------
+serverAddressImg = pygame.image.load(
+    'assets/textures/serverAddress.png').convert_alpha()
 serverAddressHeader = button.Button(SCREEN_WIDTH/2-serverAddressImg.get_width()/2*0.4,
                                     SCREEN_HEIGHT/4,
                                     serverAddressImg,
@@ -112,45 +120,51 @@ ngrokFinButton = button.Button(SCREEN_WIDTH/2 - ngrokFinImg.get_width()/2*2.8*0.
                                ngrokFinImg,
                                0.27)
 
-textInputManager = pti.TextInputManager(validator = lambda input: len(input) <= 24)
-textinputCustom = pti.TextInputVisualizer(manager=textInputManager, font_object=mcFont)
+textInputManager = pti.TextInputManager(
+    validator=lambda input: len(input) <= 24)
+textinputCustom = pti.TextInputVisualizer(
+    manager=textInputManager, font_object=mcFont)
 enteredAddress = ''
 
 
-#-----------------------------------
+# -----------------------------------
 # enter name
-#-----------------------------------
+# -----------------------------------
 
-enterNameImg = pygame.image.load('assets/textures/entername.png').convert_alpha()
+enterNameImg = pygame.image.load(
+    'assets/textures/entername.png').convert_alpha()
 enterNameButton = button.Button(SCREEN_WIDTH/2-enterNameImg.get_width()/2*0.4,
                                 SCREEN_HEIGHT/4,
                                 enterNameImg,
                                 0.4)
 
-nameInputManager = pti.TextInputManager(validator = lambda input: len(input) <= 10)
-textinputName = pti.TextInputVisualizer(manager=nameInputManager, font_object=mcFont)
+nameInputManager = pti.TextInputManager(
+    validator=lambda input: len(input) <= 10)
+textinputName = pti.TextInputVisualizer(
+    manager=nameInputManager, font_object=mcFont)
 
 
-#-----------------------------------
-# enter name
-#-----------------------------------
+# -----------------------------------
+# waiting lobby
+# -----------------------------------
 
-waitinglobbyImg = pygame.image.load('assets/textures/waitinglobby.png').convert_alpha()
+waitinglobbyImg = pygame.image.load(
+    'assets/textures/waitinglobby.png').convert_alpha()
 waitinglobbyButton = button.Button(SCREEN_WIDTH/2-waitinglobbyImg.get_width()/2*0.4,
                                    SCREEN_HEIGHT/4,
                                    waitinglobbyImg,
                                    0.4)
 
 
-#-----------------------------------
+# -----------------------------------
 # game room
-#-----------------------------------
+# -----------------------------------
 
 tableImg = pygame.image.load('assets/textures/table.png').convert_alpha()
 tableButton = button.Button(SCREEN_WIDTH/2 - tableImg.get_width()/2*0.25,
-                                SCREEN_HEIGHT/2 - tableImg.get_height()/2*0.25,
-                                tableImg,
-                                0.25)
+                            SCREEN_HEIGHT/2 - tableImg.get_height()/2*0.25,
+                            tableImg,
+                            0.25)
 
 colours = ['red', 'green', 'blue', 'yellow']
 cardsList = {}
@@ -159,27 +173,38 @@ cardButtons = {}
 for colour in colours:
     cardsList[colour[0].upper()] = []
     for num in range(10):
-        cardsList[colour[0].upper()].append(pygame.image.load(f'assets/textures/cards/{colour}/{colour}{num}.png').convert_alpha())
-    cardsList[colour[0].upper()].append(pygame.image.load(f'assets/textures/cards/{colour}/{colour}Plus2.png').convert_alpha())
-    cardsList[colour[0].upper()].append(pygame.image.load(f'assets/textures/cards/{colour}/{colour}Rev.png').convert_alpha())
-    cardsList[colour[0].upper()].append(pygame.image.load(f'assets/textures/cards/{colour}/{colour}Skip.png').convert_alpha())
+        cardsList[colour[0].upper()].append(pygame.image.load(
+            f'assets/textures/cards/{colour}/{colour}{num}.png').convert_alpha())
+    cardsList[colour[0].upper()].append(pygame.image.load(
+        f'assets/textures/cards/{colour}/{colour}Plus2.png').convert_alpha())
+    cardsList[colour[0].upper()].append(pygame.image.load(
+        f'assets/textures/cards/{colour}/{colour}Rev.png').convert_alpha())
+    cardsList[colour[0].upper()].append(pygame.image.load(
+        f'assets/textures/cards/{colour}/{colour}Skip.png').convert_alpha())
 cardsList['X'] = []
-cardsList['X'].append(pygame.image.load(f'assets/textures/cards/others/X+4.png').convert_alpha())
-cardsList['X'].append(pygame.image.load(f'assets/textures/cards/others/Xwild.png').convert_alpha())
-cardsList['unoBack'] = pygame.image.load(f'assets/textures/cards/others/unoBack.png').convert_alpha()
+cardsList['X'].append(pygame.image.load(
+    f'assets/textures/cards/others/X+4.png').convert_alpha())
+cardsList['X'].append(pygame.image.load(
+    f'assets/textures/cards/others/Xwild.png').convert_alpha())
+cardsList['unoBack'] = pygame.image.load(
+    f'assets/textures/cards/others/unoBack.png').convert_alpha()
 
 gameplayImg = {}
-gameplayImg['yourTurn'] = pygame.image.load(f'assets/textures/yourTurn.png').convert_alpha()
-gameplayImg['notYourTurn'] = pygame.image.load(f'assets/textures/notYourTurn.png').convert_alpha()
-gameplayImg['ok'] = pygame.image.load(f'assets/textures/ok.png').convert_alpha()
+gameplayImg['yourTurn'] = pygame.image.load(
+    f'assets/textures/yourTurn.png').convert_alpha()
+gameplayImg['notYourTurn'] = pygame.image.load(
+    f'assets/textures/notYourTurn.png').convert_alpha()
+gameplayImg['ok'] = pygame.image.load(
+    f'assets/textures/ok.png').convert_alpha()
 gameplayImg['pick'] = {}
 for colour in colours:
-    gameplayImg['pick'][colour] = pygame.image.load(f'assets/textures/pick{colour}.png').convert_alpha()
+    gameplayImg['pick'][colour] = pygame.image.load(
+        f'assets/textures/pick{colour}.png').convert_alpha()
 
 
-#-----------------------------------
+# -----------------------------------
 # Game Loop
-#-----------------------------------
+# -----------------------------------
 run = True
 config.buttonUpdate = 0
 pygame.key.set_repeat(300, 25)
@@ -188,9 +213,9 @@ while run:
 
     screen.fill((202, 228, 241))
     events = pygame.event.get()
-    
+
     # back button
-    if config.Page and backButton.draw(screen) and config.Page <5:
+    if config.Page and backButton.draw(screen) and config.Page < 5:
         if config.Page == 3:
             config.Page = config.lastPage
             config.lastPage = 0
@@ -204,14 +229,15 @@ while run:
     # enter room size
     elif config.Page == 1:
         enterRoomSizeHeader.draw(screen)
-        enterRoomSize.display(screen, roomSizeButtons, roomSizeButtonsFinal, roomSizeNames)
+        enterRoomSize.display(screen, roomSizeButtons,
+                              roomSizeButtonsFinal, roomSizeNames)
 
     # enter server address
     elif config.Page == 2:
         textinputCustom.update(events)
         serverAddressHeader.draw(screen)
         serverAddress.display(screen, ngrokButton, ngrokFinButton)
-        
+
         screen.blit(textinputCustom.surface, (SCREEN_WIDTH/2 - 50,
                                               SCREEN_HEIGHT/2 + ngrokImg.get_height()/2*0.27 + 7,
                                               TEXTBOX_WIDTH,
@@ -222,9 +248,9 @@ while run:
         enterNameButton.draw(screen)
         textinputName.update(events)
         screen.blit(textinputName.surface, (SCREEN_WIDTH/2 - 50,
-                                              SCREEN_HEIGHT/2 + ngrokImg.get_height()/2*0.27 + 7,
-                                              TEXTBOX_WIDTH,
-                                              TEXTBOX_HEIGHT))
+                                            SCREEN_HEIGHT/2 + ngrokImg.get_height()/2*0.27 + 7,
+                                            TEXTBOX_WIDTH,
+                                            TEXTBOX_HEIGHT))
 
     elif config.Page == 4:
         waitinglobbyButton.draw(screen)
@@ -258,7 +284,7 @@ while run:
                 print(f"Name = {config.playerName}")
                 config.Page = 4
                 # textinputName.value = ''
-                clientData.start()
+                uno_client.start()
                 print("aage")
 
             elif config.Page == 2:

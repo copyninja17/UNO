@@ -1,3 +1,8 @@
+'''
+Button object for pygame.
+Easier image and button handling as compared to native button method.
+'''
+
 import pygame
 
 #button class

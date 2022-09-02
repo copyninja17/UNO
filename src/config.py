@@ -1,14 +1,17 @@
+'''
+Holds global variables for all scripts to access
+'''
+
 try:
     from src import uno_module as uno
 except:
     import uno_module as uno
 
-'''
-Holds global variables for all scripts to access
-'''
 #-----------------------------------
 # Backend
 #----------------------------------- 
+
+platform = None
 
 myDeck = uno.Deck()
 myDeck.shuffle()

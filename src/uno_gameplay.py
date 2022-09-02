@@ -1,7 +1,16 @@
+'''
+THIS FILE IS CURRENTLY NOT IN USE.
+
+This is a single-system version of game.
+This was developed as a POC for basic UNO gameplay.
+'''
+
 import uno_module as uno
-from os import system
 import uno_ai as ai
+
+from os import system
 import time
+
 
 game = True
 players = []
@@ -64,7 +73,9 @@ while game:
         if not base_is_action:
             print(f"Your turn {players[0]['name']}: {players[0]['hand'].show()}")
 
-            playable_cards = uno.isplayable(discard_pile.stack[-1], players[0]['hand'], assumed_colour)
+            playable_cards = uno.isplayable(discard_pile.stack[-1], 
+                                            players[0]['hand'], 
+                                            assumed_colour)
 
             if playable_cards != 'None':
                 print(f"Playable cards: {playable_cards.show()}")

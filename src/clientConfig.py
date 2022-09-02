@@ -1,3 +1,7 @@
+'''
+Exclusive Config file for client variables.
+'''
+
 top_card = None
 player_hand  = None
 eventID = None

@@ -1,3 +1,7 @@
+'''
+Handles communication between client and server over sockets.
+'''
+
 import socket
 
 class Network:

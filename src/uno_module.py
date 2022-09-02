@@ -223,7 +223,9 @@ def isPlayable(base_card, lst, assumed_colour='0'):
     playable = Stack()
     i=0
     while i!=len(lst.stack):
-        if (lst.stack[i].card['colour'] in [base_card.card['colour'], 'X']) or (lst.stack[i].card['val'] in [base_card.card['val'], '+4', 'wild']) or (lst.stack[i].card['colour'] == assumed_colour and base_card.card['colour']=='X'):
+        if ((lst.stack[i].card['colour'] in [base_card.card['colour'], 'X']) or 
+            (lst.stack[i].card['val'] in [base_card.card['val'], '+4', 'wild']) or 
+            (lst.stack[i].card['colour'] == assumed_colour and base_card.card['colour']=='X')):
             playable.add(lst.deal(0, i))
         else:
             i+=1
@@ -308,7 +310,7 @@ def pressEnterKey():
         if x == '':
             break
 
-# [TODO] Modify for use in current version
+# [TODO] Modify for use in current(GUI) version
 def isAI():
     while True: 
         c = Input("Is this player computer? (Y/N): ", str)
