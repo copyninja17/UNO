@@ -8,9 +8,10 @@ Handles all client side operations like selection and communication.
 from src import config
 from src.bridge import Network
 from src import uno_module as uno
-import subprocess, sys
-import threading
 from src import clientConfig as cc
+
+import subprocess, sys, os
+import threading
 
 class Client:
 
@@ -220,16 +221,17 @@ def display(addrPort):
 
 def start():
     if config.host is True:
-        if config.platorm == 'Windows':
+        if config.platform == 'Windows':
             subprocess.Popen([sys.executable, f'src/uno_server.py', f'{config.settings}'],
                             creationflags=subprocess.CREATE_NEW_CONSOLE)
-        else:
-            subprocess.Popen([sys.executable, f'src/uno_server.py', f'{config.settings}'],
-                            shell=True)
+        # else:
+            # subprocess.Popen(['python3.10', f'src/uno_server.py', f'{config.settings}'],
+            #                 shell=False)
+            # os.system(f'python3 src/uno_server.py {config.settings}')
 
-        print("before exec")
+        # print("before exec")
         threading.Thread(target=display, args=('localhost:5555',)).start()
-        print("exec")
+        # print("exec")
         
     elif config.host is False:
         threading.Thread(target=display, args=(config.settings,)).start()

@@ -1,4 +1,4 @@
-from src import config, button
+from src import config
 
 def display(screen, roomSizeButtons, roomSizeButtonsFinal, roomSizeNames):
     for i in range(3):

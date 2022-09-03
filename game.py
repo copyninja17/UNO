@@ -1,11 +1,11 @@
-import pygame
-import platform
-
 from src import button
 import pygame_textinput as pti
 from src import config, uno_client
 from pages import hostPrompt, enterRoomSize, serverAddress, startGame
 from src import clientConfig as cc
+
+import pygame
+import platform
 
 
 config.platform = platform.system()
@@ -285,7 +285,7 @@ while run:
                 config.Page = 4
                 # textinputName.value = ''
                 uno_client.start()
-                print("aage")
+                # print("aage")
 
             elif config.Page == 2:
                 config.settings = textinputCustom.value
