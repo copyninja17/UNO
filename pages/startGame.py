@@ -38,7 +38,7 @@ def cardDisplay(screen, cardsList, currCard, x=-1, y=-1):
 
 def printHand(screen,cardsList):
     try:
-        print("[startgame] Printing cards")
+        # print("[startgame] Printing cards")
         if cc.winner == cc.playerName:
             print("[startGame] Winner decided")
             return
@@ -58,7 +58,7 @@ def display(screen, tableButton, cardsList, gameplayImg):
     if cc.winner !='NONE':
         print("[startGame] Winner decided")
         return
-        
+
     tableButton.draw(screen)
     # if cc.winner == 'None':
     cardDisplay(screen, cardsList, cc.top_card)
