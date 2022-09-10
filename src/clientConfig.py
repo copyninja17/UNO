@@ -2,6 +2,7 @@
 Exclusive Config file for client variables.
 '''
 
+playerName = ''
 top_card = None
 player_hand  = None
 eventID = None
@@ -13,3 +14,4 @@ playable_cards = None
 currentChoice = None
 okPrompt = None
 colourChange = None
+receivedPlayerList = False

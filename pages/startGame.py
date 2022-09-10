@@ -38,6 +38,10 @@ def cardDisplay(screen, cardsList, currCard, x=-1, y=-1):
 
 def printHand(screen,cardsList):
     try:
+        print("[startgame] Printing cards")
+        if cc.winner == cc.playerName:
+            print("[startGame] Winner decided")
+            return
         numCards = len(cc.player_hand.stack)
         for i in range(numCards):
             cardDisplay(screen, 
@@ -45,12 +49,16 @@ def printHand(screen,cardsList):
                         cc.player_hand.stack[i], 
                         x=(10 + cardsList['R'][0].get_width()*0.4)*(i+1), 
                         y=SCREEN_HEIGHT-100)
-    except:
-        pass
+    except Exception as e:
+        print(e)
 
 
 
 def display(screen, tableButton, cardsList, gameplayImg):
+    if cc.winner !='NONE':
+        print("[startGame] Winner decided")
+        return
+        
     tableButton.draw(screen)
     # if cc.winner == 'None':
     cardDisplay(screen, cardsList, cc.top_card)

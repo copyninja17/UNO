@@ -280,8 +280,8 @@ while run:
 
         if event.type == pygame.KEYDOWN and event.key == pygame.K_RETURN:
             if config.Page == 3:
-                config.playerName = textinputName.value
-                print(f"Name = {config.playerName}")
+                cc.playerName = textinputName.value
+                print(f"Name = {cc.playerName}")
                 config.Page = 4
                 # textinputName.value = ''
                 uno_client.start()

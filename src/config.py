@@ -35,6 +35,8 @@ assumedColour = '0'
 
 Winner = 'NONE'
 
+SERVER_EXIT = False
+
 
 #-----------------------------------
 # GUI
@@ -43,8 +45,6 @@ Winner = 'NONE'
 host = None
 
 settings = None
-
-playerName = ''
 
 buttonUpdate = 0
 
