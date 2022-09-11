@@ -9,7 +9,7 @@ X = 'X'
 colours = [R,B,G,Y,X]
 SCREEN_WIDTH = 800
 SCREEN_HEIGHT = 450
-
+CARD_SIZE = 1.0
 
 def cardDisplay(screen, cardsList, currCard, x=-1, y=-1):
 
@@ -28,10 +28,10 @@ def cardDisplay(screen, cardsList, currCard, x=-1, y=-1):
         val = int(currCard.card['val'])
     
     if x == -1:
-        x = SCREEN_WIDTH/2 - cardsList['R'][0].get_width()/2*0.4
-        y = SCREEN_HEIGHT/4 + cardsList['R'][0].get_height()*0.4
+        x = SCREEN_WIDTH/2 - cardsList['R'][0].get_width()/2*CARD_SIZE
+        y = SCREEN_HEIGHT/4 + cardsList['R'][0].get_height()/2*CARD_SIZE
     # find the image
-    if button.Button(x,y,cardsList[col][val], 0.4).draw(screen):
+    if button.Button(x,y,cardsList[col][val], CARD_SIZE).draw(screen):
         cc.currentChoice = currCard
 
     # make a new button
@@ -40,15 +40,15 @@ def printHand(screen,cardsList):
     try:
         # print("[startgame] Printing cards")
         if cc.winner == cc.playerName:
-            print("[startGame] Winner decided")
+            # print("[startGame] Winner decided")
             return
         numCards = len(cc.player_hand.stack)
         for i in range(numCards):
             cardDisplay(screen, 
                         cardsList, 
                         cc.player_hand.stack[i], 
-                        x=(10 + cardsList['R'][0].get_width()*0.4)*(i+1), 
-                        y=SCREEN_HEIGHT-100)
+                        x=(10 + cardsList['R'][0].get_width()*CARD_SIZE)*(i+1), 
+                        y=SCREEN_HEIGHT-125)
     except Exception as e:
         print(e)
 
@@ -56,7 +56,7 @@ def printHand(screen,cardsList):
 
 def display(screen, tableButton, cardsList, gameplayImg):
     if cc.winner !='NONE':
-        print("[startGame] Winner decided")
+        # print("[startGame] Winner decided")
         return
 
     tableButton.draw(screen)
