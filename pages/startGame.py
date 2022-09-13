@@ -54,8 +54,14 @@ def printHand(screen,cardsList):
 
 
 
-def display(screen, tableButton, cardsList, gameplayImg):
+def display(screen, tableButton, cardsList, gameplayImg,myFont):
     if cc.winner !='NONE':
+        winnerName = f"YOU ARE THE WINNER!!" if cc.winner == cc.playerName else f"Winner is {cc.winner}!"
+        winnerLabel = myFont.render(winnerName, 1, (0,0,0))
+
+        x = SCREEN_WIDTH/2 - winnerLabel.get_width()/2
+        y = SCREEN_HEIGHT/2 - winnerLabel.get_height()/2
+        screen.blit(winnerLabel, (x,y))
         # print("[startGame] Winner decided")
         return
 

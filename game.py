@@ -258,7 +258,7 @@ while run:
             config.Page = 5
 
     elif config.Page == 5:
-        startGame.display(screen, tableButton, cardsList, gameplayImg)
+        startGame.display(screen, tableButton, cardsList, gameplayImg, mcFont)
 
     if config.waitingTime:
         pygame.time.wait(config.waitingTime)
