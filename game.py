@@ -20,7 +20,7 @@ TEXTBOX_HEIGHT = 35
 bPOsX = SCREEN_WIDTH/2
 bPosY = SCREEN_HEIGHT/2
 
-mcFont = pygame.font.Font('assets/fonts/Minecraft.ttf', 25)
+myFont = pygame.font.Font('assets/fonts/rimouski_sb.otf', 25)
 
 clock = pygame.time.Clock()
 screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
@@ -123,7 +123,7 @@ ngrokFinButton = button.Button(SCREEN_WIDTH/2 - ngrokFinImg.get_width()/2*2.8*0.
 textInputManager = pti.TextInputManager(
     validator=lambda input: len(input) <= 24)
 textinputCustom = pti.TextInputVisualizer(
-    manager=textInputManager, font_object=mcFont)
+    manager=textInputManager, font_object=myFont)
 enteredAddress = ''
 
 
@@ -141,7 +141,7 @@ enterNameButton = button.Button(SCREEN_WIDTH/2-enterNameImg.get_width()/2*0.4,
 nameInputManager = pti.TextInputManager(
     validator=lambda input: len(input) <= 10)
 textinputName = pti.TextInputVisualizer(
-    manager=nameInputManager, font_object=mcFont)
+    manager=nameInputManager, font_object=myFont)
 
 
 # -----------------------------------
@@ -258,7 +258,7 @@ while run:
             config.Page = 5
 
     elif config.Page == 5:
-        startGame.display(screen, tableButton, cardsList, gameplayImg)
+        startGame.display(screen, tableButton, cardsList, gameplayImg, myFont)
 
     if config.waitingTime:
         pygame.time.wait(config.waitingTime)
@@ -280,8 +280,8 @@ while run:
 
         if event.type == pygame.KEYDOWN and event.key == pygame.K_RETURN:
             if config.Page == 3:
-                config.playerName = textinputName.value
-                print(f"Name = {config.playerName}")
+                cc.playerName = textinputName.value
+                print(f"Name = {cc.playerName}")
                 config.Page = 4
                 # textinputName.value = ''
                 uno_client.start()

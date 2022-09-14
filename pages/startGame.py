@@ -9,7 +9,7 @@ X = 'X'
 colours = [R,B,G,Y,X]
 SCREEN_WIDTH = 800
 SCREEN_HEIGHT = 450
-
+CARD_SIZE = 1.0
 
 def cardDisplay(screen, cardsList, currCard, x=-1, y=-1):
 
@@ -28,29 +28,49 @@ def cardDisplay(screen, cardsList, currCard, x=-1, y=-1):
         val = int(currCard.card['val'])
     
     if x == -1:
-        x = SCREEN_WIDTH/2 - cardsList['R'][0].get_width()/2*0.4
-        y = SCREEN_HEIGHT/4 + cardsList['R'][0].get_height()*0.4
+        x = SCREEN_WIDTH/2 - cardsList['R'][0].get_width()/2*CARD_SIZE
+        y = SCREEN_HEIGHT/4 + cardsList['R'][0].get_height()/2*CARD_SIZE
     # find the image
-    if button.Button(x,y,cardsList[col][val], 0.4).draw(screen):
+    if button.Button(x,y,cardsList[col][val], CARD_SIZE).draw(screen):
         cc.currentChoice = currCard
 
     # make a new button
 
 def printHand(screen,cardsList):
     try:
-        numCards = len(cc.player_hand.stack)
-        for i in range(numCards):
-            cardDisplay(screen, 
-                        cardsList, 
-                        cc.player_hand.stack[i], 
-                        x=(10 + cardsList['R'][0].get_width()*0.4)*(i+1), 
-                        y=SCREEN_HEIGHT-100)
-    except:
-        pass
+        if cc.winner == cc.playerName:
+            return
+            
+        n = len(cc.player_hand.stack)
+        for i in range(n):
+            # x = vertical pos of cards
+            if n > 9:
+                x = (SCREEN_WIDTH * 0.9) * i / n 
+            else:
+                card_gap = 10
+                offset_x = card_gap + cardsList['R'][0].get_width() * CARD_SIZE
+                x =  + (offset_x * i)
+
+            x += SCREEN_WIDTH/20
+            y = SCREEN_HEIGHT - 150
+            
+            cardDisplay(screen, cardsList, cc.player_hand.stack[i], x, y)
+    except Exception as e:
+        print(e)
 
 
 
-def display(screen, tableButton, cardsList, gameplayImg):
+def display(screen, tableButton, cardsList, gameplayImg,myFont):
+    if cc.winner !='NONE':
+        winnerName = f"YOU ARE THE WINNER!!" if cc.winner == cc.playerName else f"WINNER IS {cc.winner}!"
+        winnerLabel = myFont.render(winnerName, 1, (0,0,0))
+
+        x = SCREEN_WIDTH/2 - winnerLabel.get_width()/2
+        y = SCREEN_HEIGHT/2 - winnerLabel.get_height()/2
+        screen.blit(winnerLabel, (x,y))
+        # print("[startGame] Winner decided")
+        return
+
     tableButton.draw(screen)
     # if cc.winner == 'None':
     cardDisplay(screen, cardsList, cc.top_card)

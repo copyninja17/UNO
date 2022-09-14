@@ -4,3 +4,4 @@ temp.py
 test/
 ngrok.exe
 .vscode/
+.DS_Store

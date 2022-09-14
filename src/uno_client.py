@@ -24,7 +24,7 @@ class Client:
         self.choice = 0
         self.colour = '0'
         self.event = ['0', 'regular', 'no_cards', '+4/+2', 'reverse', 'skip', 'wild']
-        self.playerName = config.playerName
+        self.playerName = cc.playerName
         self.playerList = []
 
     @staticmethod
@@ -35,11 +35,13 @@ class Client:
         Data form: "topCard: playerHand: responseID: cardList: playerTurn: winner: chosenColour"
         [TODO]: what's going on in the game unrelated to the player aka Broadcasting
         '''
+        print(f'{data=}')                #DEBUGGING
 
-        if ':' not in data:
+        if ':' not in data and not cc.receivedPlayerList:
             # playerList received
             try:
                 print(f"Player list retrived: {data}")
+                cc.receivedPlayerList = True
                 return data
 
             except ValueError or TypeError or IndexError:
@@ -48,14 +50,19 @@ class Client:
         else:
             # game data received
             try:
+                print(data)                     # DEBUGGING
                 top_card = uno.Card()
                 top_card.generate(data.split(":")[0][-1], data.split(":")[0][:-1])
 
                 player_hand = uno.Stack()
                 for i in list(data.split(":")[1].split(",")):
-                    sample = uno.Card()
-                    sample.generate(i[-1], i[:-1])
-                    player_hand.add(sample)
+                    try:
+                        sample = uno.Card()
+                        sample.generate(i[-1], i[:-1])
+                        player_hand.add(sample)
+                    except:
+                        print("ERROR")
+                        print(data)
 
                 eventID = int(data.split(":")[2])
 
@@ -80,7 +87,8 @@ class Client:
                         chosenColour)
 
             except ValueError or TypeError or IndexError:
-                print("ERROR RETRIEVING DATA FROM SERVER!")
+                print ("ERROR RETRIEVING DATA FROM SERVER!")
+                print (data)
                 return 0, 0, 0, 0, 0
 
     def send_recv(self, oneTime=False):
@@ -111,112 +119,124 @@ def display(addrPort):
     client.playerList = client.parse(client.send_recv(oneTime=True))
 
     while True:
-        data = client.send_recv()
+        try:
+            data = client.send_recv()
 
-        # so the client won't refresh always
-        if oldData == data:
-            continue
-        else:
-            oldData = data
+            # so the client won't refresh always
+            if oldData == data:
+                continue
+            else:
+                oldData = data
 
-        # # data received
-        # top_card, player_hand, eventID, drawn_cards, playerTurn, winner, chosenColour = client.parse(data)
-        cc.top_card, cc.player_hand, cc.eventID, cc.drawn_cards, cc.playerTurn, cc.winner, cc.chosenColour = client.parse(data)
+            # # data received
+            (cc.top_card, 
+             cc.player_hand, 
+             cc.eventID, 
+             cc.drawn_cards, 
+             cc.playerTurn, 
+             cc.winner, 
+             cc.chosenColour) = client.parse(data)
 
-        # winner/loser
-        if cc.winner == client.playerName:
-            print("\nYOU ARE THE WINNER!!\n")
+            # winner/loser
+            if cc.winner == client.playerName:
+                print("\nYOU ARE THE WINNER!!\n")
+                break
 
-        elif cc.winner != 'NONE':
-            print(f"\nWinner is {cc.winner}\n")
-        # os.system('cls')
+            elif cc.winner != 'NONE':
+                print(f"\nWinner is {cc.winner}\n")
+                break
 
-        # # prints top card
-        # print("\n+" + "-"*(13+len(top_card.show())) + "+")
-        print("|" + f" Top card = {cc.top_card.show()} " + "|")
-        # print("+" + "-"*(13+len(top_card.show())) + "+")
-        
-        print(f"Your cards: {cc.player_hand.show()}")
-        
-        if cc.playerTurn is True:
+            # # prints top card
+            # print("\n+" + "-"*(13+len(top_card.show())) + "+")
+            print("|" + f" Top card = {cc.top_card.show()} " + "|")
+            # print("+" + "-"*(13+len(top_card.show())) + "+")
+            
+            print(f"Your cards: {cc.player_hand.show()}")
+            
+            if cc.playerTurn is True:
 
-            if client.event[cc.eventID] == 'regular':
-                played_card = 0
-                fake_hand = uno.Stack()
-                fake_hand.add(cc.player_hand.stack)
-                cc.playable_cards = uno.isPlayable(cc.top_card, fake_hand, cc.chosenColour)
+                if client.event[cc.eventID] == 'regular':
+                    played_card = 0
+                    fake_hand = uno.Stack()
+                    fake_hand.add(cc.player_hand.stack)
+                    cc.playable_cards = uno.isPlayable(cc.top_card, fake_hand, cc.chosenColour)
 
-                while True:
-                    # Traps the user until input is received
-                    if cc.currentChoice is not None:
-                        # find cc.currentChoice in playable cards
-                        for i in range(len(cc.playable_cards.stack)):
-                            if cc.currentChoice == cc.playable_cards.stack[i]:
-                                played_card = i+1
-                        cc.currentChoice = None
-                    else:
-                        continue
-
-                    if played_card > 0 and played_card <= len(cc.playable_cards.stack):
-                        print(f'pc: {played_card}')
-                        # print(f"Card played: {cc.playable_cards.stack[played_card-1].show()}")
-                        if cc.playable_cards.stack[played_card-1].card['colour'] == 'X':
-                            cc.colourChange = 0
-                            while True:
-                                if cc.colourChange in ['R','B','G','Y']:
-                                    client.colour = cc.colourChange
-                                    cc.colourChange = None
-                                    break
-
-                            client.choice = played_card
+                    while True:
+                        # Traps the user until input is received
+                        if cc.currentChoice is not None:
+                            # find cc.currentChoice in playable cards
+                            for i in range(len(cc.playable_cards.stack)):
+                                if cc.currentChoice == cc.playable_cards.stack[i]:
+                                    played_card = i+1
+                            cc.currentChoice = None
                         else:
-                            client.choice = played_card
-                            client.colour = '0'
-                        break
-                    else:
-                        print(f"Please enter a number between 1 and {len(cc.playable_cards.stack)}")
+                            continue
 
-                cc.playable_cards = None
-            elif client.event[cc.eventID] == 'no_cards':
-                print(f"Your turn {client.playerName}:")
-                print("You have no playable cards")
-                cc.okPrompt = 0
-                while True:
-                    if cc.okPrompt == 1:
-                        cc.okPrompt = None
-                        break
+                        if played_card > 0 and played_card <= len(cc.playable_cards.stack):
+                            print(f'pc: {played_card}')
+                            # print(f"Card played: {cc.playable_cards.stack[played_card-1].show()}")
+                            if cc.playable_cards.stack[played_card-1].card['colour'] == 'X':
+                                cc.colourChange = 0
+                                while True:
+                                    if cc.colourChange in ['R','B','G','Y']:
+                                        client.colour = cc.colourChange
+                                        cc.colourChange = None
+                                        break
 
+                                client.choice = played_card
+                            else:
+                                client.choice = played_card
+                                client.colour = '0'
+                            break
+                        else:
+                            print(f"Please enter a number between 1 and {len(cc.playable_cards.stack)}")
+
+                    cc.playable_cards = None
+                elif client.event[cc.eventID] == 'no_cards':
+                    print(f"Your turn {client.playerName}:")
+                    print("You have no playable cards")
+                    cc.okPrompt = 0
+                    while True:
+                        if cc.okPrompt == 1:
+                            cc.okPrompt = None
+                            break
+
+                    client.choice = '0'
+                    client.colour = 'N'
+
+                elif client.event[cc.eventID] == '+4/+2':
+                    print(f"+{len(cc.drawn_cards.stack)} was used on you")
+                    print(f"Cards drawn: {cc.drawn_cards.show()}")
+
+                    cc.okPrompt = 0
+                    while True:
+                        if cc.okPrompt == 1:
+                            cc.okPrompt = None
+                            break
+
+                    client.choice = '0'
+                    client.colour = 'N'
+
+                elif client.event[cc.eventID] == 'skip':
+                    print("Your turn was skipped.")
+
+                    cc.okPrompt = 0
+                    while True:
+                        if cc.okPrompt == 1:
+                            cc.okPrompt = None
+                            break
+
+                    client.choice = '0'
+                    client.colour = 'N'
+            else:
+                client.colour = '0'
                 client.choice = '0'
-                client.colour = 'N'
+                print("not my turn")
 
-            elif client.event[cc.eventID] == '+4/+2':
-                print(f"+{len(cc.drawn_cards.stack)} was used on you")
-                print(f"Cards drawn: {cc.drawn_cards.show()}")
-
-                cc.okPrompt = 0
-                while True:
-                    if cc.okPrompt == 1:
-                        cc.okPrompt = None
-                        break
-
-                client.choice = '0'
-                client.colour = 'N'
-
-            elif client.event[cc.eventID] == 'skip':
-                print("Your turn was skipped.")
-
-                cc.okPrompt = 0
-                while True:
-                    if cc.okPrompt == 1:
-                        cc.okPrompt = None
-                        break
-
-                client.choice = '0'
-                client.colour = 'N'
-        else:
-            client.colour = '0'
-            client.choice = '0'
-            print("not my turn")
+        except ValueError as e:
+            print("BAD VALUE")
+            print(e)
+            print(f'{data=}')
 
 
 def start():
