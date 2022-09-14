@@ -4,7 +4,7 @@ UNO is a fun card game where players put down matching cards and the one with 0 
 We are bringing this multiplayer card game to PC with support for more than 4 players.
 > The official android version of **[Mattel UNO](https://play.google.com/store/apps/details?id=com.matteljv.uno&hl=en_IN&gl=US)** supports only 4 players
 
-## v0.7 beta
+## v0.8 beta
 
 ### Features
 - Playable over LAN or internet using [ngrok](https://ngrok.com/)
@@ -17,8 +17,8 @@ We are bringing this multiplayer card game to PC with support for more than 4 pl
 
 ### Upcoming Features
 - Party rules
-- Full Graphics
 - Broadcasting
+- Animations
 
 # Installation
 Install [PyInstaller](https://pyinstaller.readthedocs.io/en/stable/) from [pip](https://pip.pypa.io/en/stable/)
