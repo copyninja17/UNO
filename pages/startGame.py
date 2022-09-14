@@ -38,17 +38,23 @@ def cardDisplay(screen, cardsList, currCard, x=-1, y=-1):
 
 def printHand(screen,cardsList):
     try:
-        # print("[startgame] Printing cards")
         if cc.winner == cc.playerName:
-            # print("[startGame] Winner decided")
             return
-        numCards = len(cc.player_hand.stack)
-        for i in range(numCards):
-            cardDisplay(screen, 
-                        cardsList, 
-                        cc.player_hand.stack[i], 
-                        x=(10 + cardsList['R'][0].get_width()*CARD_SIZE)*(i+1), 
-                        y=SCREEN_HEIGHT-125)
+            
+        n = len(cc.player_hand.stack)
+        for i in range(n):
+            # x = vertical pos of cards
+            if n > 9:
+                x = (SCREEN_WIDTH * 0.9) * i / n 
+            else:
+                card_gap = 10
+                offset_x = card_gap + cardsList['R'][0].get_width() * CARD_SIZE
+                x =  + (offset_x * i)
+
+            x += SCREEN_WIDTH/20
+            y = SCREEN_HEIGHT - 150
+            
+            cardDisplay(screen, cardsList, cc.player_hand.stack[i], x, y)
     except Exception as e:
         print(e)
 
@@ -56,7 +62,7 @@ def printHand(screen,cardsList):
 
 def display(screen, tableButton, cardsList, gameplayImg,myFont):
     if cc.winner !='NONE':
-        winnerName = f"YOU ARE THE WINNER!!" if cc.winner == cc.playerName else f"Winner is {cc.winner}!"
+        winnerName = f"YOU ARE THE WINNER!!" if cc.winner == cc.playerName else f"WINNER IS {cc.winner}!"
         winnerLabel = myFont.render(winnerName, 1, (0,0,0))
 
         x = SCREEN_WIDTH/2 - winnerLabel.get_width()/2
