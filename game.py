@@ -13,8 +13,8 @@ config.platform = platform.system()
 pygame.init()
 
 # create display window
-SCREEN_HEIGHT = 450
-SCREEN_WIDTH = 800
+SCREEN_HEIGHT = 600 #450
+SCREEN_WIDTH = 1000
 TEXTBOX_WIDTH = 272
 TEXTBOX_HEIGHT = 35
 bPOsX = SCREEN_WIDTH/2
@@ -40,8 +40,8 @@ createRoom = pygame.image.load(
     'assets/textures/createroom.png').convert_alpha()
 joinRoom = pygame.image.load('assets/textures/joinroom.png').convert_alpha()
 
-createButton = button.Button(100, 200, createRoom, 0.4)
-joinButton = button.Button(450, 200, joinRoom, 0.4)
+createButton = button.Button(SCREEN_WIDTH/6*2 - (createRoom.get_width()/2 * 0.4), SCREEN_HEIGHT/2.25, createRoom, 0.4)
+joinButton = button.Button(SCREEN_WIDTH/6*4 - (joinRoom.get_width()/2 * 0.4), SCREEN_HEIGHT/2.25, joinRoom, 0.4)
 
 
 # -----------------------------------
@@ -215,12 +215,13 @@ while run:
     events = pygame.event.get()
 
     # back button
-    if config.Page and backButton.draw(screen) and config.Page < 5:
-        if config.Page == 3:
-            config.Page = config.lastPage
-            config.lastPage = 0
-        else:
-            config.Page = 0
+    if config.Page < 5 and config.Page > 0:
+        if backButton.draw(screen):
+            if config.Page == 3:
+                config.Page = config.lastPage
+                config.lastPage = 0
+            else:
+                config.Page = 0
 
     # create/join room
     if config.Page == 0:

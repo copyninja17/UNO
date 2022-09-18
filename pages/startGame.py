@@ -7,8 +7,8 @@ G = 'green'
 Y = 'yellow'
 X = 'X'
 colours = [R,B,G,Y,X]
-SCREEN_WIDTH = 800
-SCREEN_HEIGHT = 450
+SCREEN_WIDTH = 1000
+SCREEN_HEIGHT = 600 #450
 CARD_SIZE = 1.0
 
 def cardDisplay(screen, cardsList, currCard, x=-1, y=-1):
@@ -52,7 +52,7 @@ def printHand(screen,cardsList):
                 x =  + (offset_x * i)
 
             x += SCREEN_WIDTH/20
-            y = SCREEN_HEIGHT - 150
+            y = SCREEN_HEIGHT - cardsList['R'][0].get_height() - 10
             
             cardDisplay(screen, cardsList, cc.player_hand.stack[i], x, y)
     except Exception as e:
@@ -76,9 +76,9 @@ def display(screen, tableButton, cardsList, gameplayImg,myFont):
     cardDisplay(screen, cardsList, cc.top_card)
     printHand(screen, cardsList)
     if cc.playerTurn is True:
-        button.Button(10, 10, gameplayImg['yourTurn'], 0.4).draw(screen)
+        button.Button(10, 10, gameplayImg['yourTurn'], 0.2).draw(screen)
     else:
-        button.Button(10, 10, gameplayImg['notYourTurn'], 0.4).draw(screen)
+        button.Button(10, 10, gameplayImg['notYourTurn'], 0.2).draw(screen)
 
     if cc.okPrompt == 0:
         if button.Button(SCREEN_WIDTH-gameplayImg['ok'].get_width()*0.25 -10,

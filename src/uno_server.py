@@ -114,9 +114,11 @@ def prepare():
         if config.myDeck.deck[0].card['colour'] == 'X':
             config.myDeck.shuffle()
         else:
+            print("wild clause")
             break
-    print("wild clause")
-
+    
+    config.myDiscard_pile.add(config.myDeck.deal(1))
+    
     # creating config.myReplies
     for i in config.myPlayerList:
         sample_dict = {'choice': '0', 'colour': '0'}
@@ -326,10 +328,12 @@ def threaded_client(conn):
                             reply = ",".join(config.myPlayerList)
                             print(f"Sending to : " + reply)
                             break
-                        else:
+                        elif len(config.myPlayerList) != config.playerCount:
                             print(
                                 f"config.myPlayers joined({len(config.myPlayerList)}/{roomSize})")
                             print("Waiting...")
+                            config.playerCount = len(config.myPlayerList)
+                            
                     print(f"Sending to {name}: {reply}")
 
                 conn.sendall(str.encode(reply))

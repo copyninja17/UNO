@@ -19,11 +19,12 @@ myDeck.shuffle()
 myPreparations_complete = False
 
 myDiscard_pile = uno.Stack()
-myDiscard_pile.add(myDeck.deal(1))
 
 myStorage = 0
 
 myPlayerList = []
+
+playerCount = 0
 
 myPlayers = []
 
