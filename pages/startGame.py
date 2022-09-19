@@ -1,6 +1,9 @@
 from src import clientConfig as cc
 from src import button
 
+import math
+
+
 R = 'red'
 B = 'blue'
 G = 'green'
@@ -29,7 +32,7 @@ def cardDisplay(screen, cardsList, currCard, x=-1, y=-1):
     
     if x == -1:
         x = SCREEN_WIDTH/2 - cardsList['R'][0].get_width()/2*CARD_SIZE
-        y = SCREEN_HEIGHT/4 + cardsList['R'][0].get_height()/2*CARD_SIZE
+        y = SCREEN_HEIGHT/2 - cardsList['R'][0].get_height()/2*CARD_SIZE
     # find the image
     if button.Button(x,y,cardsList[col][val], CARD_SIZE).draw(screen):
         cc.currentChoice = currCard
@@ -51,13 +54,42 @@ def printHand(screen,cardsList):
                 offset_x = card_gap + cardsList['R'][0].get_width() * CARD_SIZE
                 x =  + (offset_x * i)
 
-            x += SCREEN_WIDTH/20
-            y = SCREEN_HEIGHT - cardsList['R'][0].get_height() - 10
+            x += SCREEN_WIDTH / 20
+            y  = SCREEN_HEIGHT - cardsList['R'][0].get_height() - 10
             
             cardDisplay(screen, cardsList, cc.player_hand.stack[i], x, y)
     except Exception as e:
         print(e)
 
+
+def uno_back_coords(baseAngle ,tableButton, cardsList, index):
+    angle = math.radians(index * cc.playerAngle + baseAngle)
+    
+    x = (SCREEN_WIDTH/2 - tableButton.width/2*1) * math.cos(angle) + SCREEN_WIDTH/2 - cardsList['unoBack'].get_width()/2
+    y = (SCREEN_HEIGHT/2 - tableButton.height/2*1) * math.sin(angle) - cardsList['unoBack'].get_height()
+    print(x,y)
+    
+    return (x,y)
+
+
+def printPlayers(screen, cardsList, myFont, tableButton):
+    if cc.playerCount == 2:
+        baseAngle = 0
+        cc.playerAngle = 90
+    
+    elif cc.playerCount == 3:
+        baseAngle = -90
+        cc.playerAngle = 120
+
+    elif cc.playerCount > 3:
+        baseAngle = -30
+        cc.playerAngle = 180/(cc.playerCount - 2)
+    
+    else:
+        return
+    
+    for i, player in enumerate(cc.playerList[:-1]):
+        screen.blit(cardsList['unoBack'], uno_back_coords(baseAngle, tableButton, cardsList, i+1))
 
 
 def display(screen, tableButton, cardsList, gameplayImg,myFont):
@@ -68,13 +100,13 @@ def display(screen, tableButton, cardsList, gameplayImg,myFont):
         x = SCREEN_WIDTH/2 - winnerLabel.get_width()/2
         y = SCREEN_HEIGHT/2 - winnerLabel.get_height()/2
         screen.blit(winnerLabel, (x,y))
-        # print("[startGame] Winner decided")
         return
 
     tableButton.draw(screen)
-    # if cc.winner == 'None':
+    printPlayers(screen, cardsList, myFont, tableButton)
     cardDisplay(screen, cardsList, cc.top_card)
     printHand(screen, cardsList)
+
     if cc.playerTurn is True:
         button.Button(10, 10, gameplayImg['yourTurn'], 0.2).draw(screen)
     else:

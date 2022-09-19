@@ -42,7 +42,7 @@ class Client:
             try:
                 print(f"Player list retrived: {data}")
                 cc.receivedPlayerList = True
-                return data
+                return data.split(',') if ',' in data else [data,]
 
             except ValueError or TypeError or IndexError:
                 print("ERROR RETRIEVING DATA FROM SERVER!")
@@ -117,6 +117,11 @@ def display(addrPort):
 
     # Retrieve playerList (one time data)
     client.playerList = client.parse(client.send_recv(oneTime=True))
+    cc.playerList = client.playerList.copy()
+    cc.playerCount = len(cc.playerList)
+    
+    while cc.playerList[-1] != cc.playerName:
+        cc.playerList.append(cc.playerList.pop(0))
 
     while True:
         try:

@@ -160,11 +160,11 @@ waitinglobbyButton = button.Button(SCREEN_WIDTH/2-waitinglobbyImg.get_width()/2*
 # game room
 # -----------------------------------
 
-tableImg = pygame.image.load('assets/textures/table.png').convert_alpha()
-tableButton = button.Button(SCREEN_WIDTH/2 - tableImg.get_width()/2*0.25,
-                            SCREEN_HEIGHT/2 - tableImg.get_height()/2*0.25,
+tableImg = pygame.image.load('assets/textures/uno_table.png').convert_alpha()
+tableButton = button.Button(SCREEN_WIDTH/2 - tableImg.get_width()/2*1,
+                            SCREEN_HEIGHT/2 - tableImg.get_height()/2*1,
                             tableImg,
-                            0.25)
+                            1)
 
 colours = ['red', 'green', 'blue', 'yellow']
 cardsList = {}
@@ -181,6 +181,7 @@ for colour in colours:
         f'assets/textures/cards/{colour}/{colour}Rev.png').convert_alpha())
     cardsList[colour[0].upper()].append(pygame.image.load(
         f'assets/textures/cards/{colour}/{colour}Skip.png').convert_alpha())
+
 cardsList['X'] = []
 cardsList['X'].append(pygame.image.load(
     f'assets/textures/cards/others/X+4.png').convert_alpha())
