@@ -66,7 +66,7 @@ def uno_back_coords(baseAngle ,tableButton, cardsList, index):
     angle = math.radians(index * cc.playerAngle + baseAngle)
     
     x = (SCREEN_WIDTH/2 - tableButton.width/2*1) * math.cos(angle) + SCREEN_WIDTH/2 - cardsList['unoBack'].get_width()/2
-    y = (SCREEN_HEIGHT/2 - tableButton.height/2*1) * math.sin(angle) - cardsList['unoBack'].get_height()
+    y = SCREEN_HEIGHT/2 - (tableButton.height/2*1) * math.sin(angle) - cardsList['unoBack'].get_height()
     print(x,y)
     
     return (x,y)
@@ -81,9 +81,13 @@ def printPlayers(screen, cardsList, myFont, tableButton):
         baseAngle = -90
         cc.playerAngle = 120
 
-    elif cc.playerCount > 3:
-        baseAngle = -30
-        cc.playerAngle = 180/(cc.playerCount - 2)
+    elif cc.playerCount == 4:
+        baseAngle = -90
+        cc.playerAngle = 90        
+
+    elif cc.playerCount > 4:
+        cc.playerAngle = 240/(cc.playerCount - 2)
+        baseAngle = -30 - cc.playerAngle
     
     else:
         return
