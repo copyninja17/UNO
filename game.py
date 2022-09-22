@@ -20,7 +20,10 @@ TEXTBOX_HEIGHT = 35
 bPOsX = SCREEN_WIDTH/2
 bPosY = SCREEN_HEIGHT/2
 
-myFont = pygame.font.Font('assets/fonts/rimouski_sb.otf', 25)
+myFont = [None] * 3
+myFont[0] = pygame.font.Font('assets/fonts/rimouski_sb.otf', 25)
+myFont[1] = pygame.font.Font('assets/fonts/rimouski_sb.otf', 18)
+myFont[2] = pygame.font.Font('assets/fonts/rimouski_sb.otf', 32)
 
 clock = pygame.time.Clock()
 screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
@@ -123,7 +126,7 @@ ngrokFinButton = button.Button(SCREEN_WIDTH/2 - ngrokFinImg.get_width()/2*2.8*0.
 textInputManager = pti.TextInputManager(
     validator=lambda input: len(input) <= 24)
 textinputCustom = pti.TextInputVisualizer(
-    manager=textInputManager, font_object=myFont)
+    manager=textInputManager, font_object=myFont[0])
 enteredAddress = ''
 
 
@@ -141,7 +144,7 @@ enterNameButton = button.Button(SCREEN_WIDTH/2-enterNameImg.get_width()/2*0.4,
 nameInputManager = pti.TextInputManager(
     validator=lambda input: len(input) <= 10)
 textinputName = pti.TextInputVisualizer(
-    manager=nameInputManager, font_object=myFont)
+    manager=nameInputManager, font_object=myFont[0])
 
 
 # -----------------------------------

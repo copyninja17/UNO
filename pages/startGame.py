@@ -67,7 +67,6 @@ def uno_back_coords(baseAngle ,tableButton, cardsList, index):
     
     x = (SCREEN_WIDTH/2 - tableButton.width/2*1) * math.cos(angle) + SCREEN_WIDTH/2 - cardsList['unoBack'].get_width()/2
     y = SCREEN_HEIGHT/2 - (tableButton.height/2*1) * math.sin(angle) - cardsList['unoBack'].get_height()
-    print(x,y)
     
     return (x,y)
 
@@ -93,13 +92,19 @@ def printPlayers(screen, cardsList, myFont, tableButton):
         return
     
     for i, player in enumerate(cc.playerList[:-1]):
-        screen.blit(cardsList['unoBack'], uno_back_coords(baseAngle, tableButton, cardsList, i+1))
+        card_coords = uno_back_coords(baseAngle, tableButton, cardsList, i+1)
+        screen.blit(cardsList['unoBack'],card_coords)
+
+        playerLabel = myFont[1].render(player, 1, (0,0,0))
+        x = card_coords[0] + cardsList['unoBack'].get_width()/2 - playerLabel.get_width()/2
+        y = card_coords[1] + cardsList['unoBack'].get_height() + 5
+        screen.blit(playerLabel, (x,y))
 
 
 def display(screen, tableButton, cardsList, gameplayImg,myFont):
     if cc.winner !='NONE':
         winnerName = f"YOU ARE THE WINNER!!" if cc.winner == cc.playerName else f"WINNER IS {cc.winner}!"
-        winnerLabel = myFont.render(winnerName, 1, (0,0,0))
+        winnerLabel = myFont[2].render(winnerName, 1, (0,0,0))
 
         x = SCREEN_WIDTH/2 - winnerLabel.get_width()/2
         y = SCREEN_HEIGHT/2 - winnerLabel.get_height()/2
