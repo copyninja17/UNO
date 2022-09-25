@@ -52,10 +52,10 @@ class Client:
             try:
                 print(data)                     # DEBUGGING
                 top_card = uno.Card()
-                top_card.generate(data.split(":")[0][-1], data.split(":")[0][:-1])
+                top_card.generate(data.split(':')[0][-1], data.split(':')[0][:-1])
 
                 player_hand = uno.Stack()
-                for i in list(data.split(":")[1].split(",")):
+                for i in list(data.split(':')[1].split(',')):
                     try:
                         sample = uno.Card()
                         sample.generate(i[-1], i[:-1])
@@ -64,25 +64,30 @@ class Client:
                         print("ERROR")
                         print(data)
 
-                eventID = int(data.split(":")[2])
+                eventID = int(data.split(':')[2])
 
                 drawn_cards = uno.Stack()
-                for i in list(data.split(":")[3].split(",")):
+                for i in list(data.split(':')[3].split(',')):
                     sample = uno.Card()
                     sample.generate(i[-1], i[:-1])
                     drawn_cards.add(sample)
 
-                playerTurn = bool(int(data.split(":")[4]))
+                playerTurn = data.split(':')[4]
 
-                winner = data.split(":")[5]
+                players = {}
+                for player in data.split(':')[5].split(','):
+                    players[player.split('=')[0]] = player.split('=')[1]
 
-                chosenColour = data.split(":")[6]
+                winner = data.split(':')[6]
+
+                chosenColour = data.split(':')[7]
 
                 return (top_card, 
                         player_hand, 
                         eventID, 
                         drawn_cards, 
                         playerTurn, 
+                        players, 
                         winner, 
                         chosenColour)
 
@@ -102,8 +107,8 @@ class Client:
             reply = self.net.communicate(self.playerName)
             return reply
         else:
-            data = (str(self.net.id) + ":" + 
-                    str(self.choice) + "," + 
+            data = (str(self.net.id) + ':' + 
+                    str(self.choice) + ',' + 
                     str(self.colour))
             reply = self.net.communicate(data)
             return reply
@@ -139,6 +144,7 @@ def display(addrPort):
              cc.eventID, 
              cc.drawn_cards, 
              cc.playerTurn, 
+             cc.players, 
              cc.winner, 
              cc.chosenColour) = client.parse(data)
 
@@ -158,7 +164,7 @@ def display(addrPort):
             
             print(f"Your cards: {cc.player_hand.show()}")
             
-            if cc.playerTurn is True:
+            if cc.playerTurn == cc.playerName:
 
                 if client.event[cc.eventID] == 'regular':
                     played_card = 0

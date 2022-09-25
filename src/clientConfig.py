@@ -17,3 +17,4 @@ colourChange = None
 receivedPlayerList = False
 playerList = []
 playerCount = 0
+players = {}

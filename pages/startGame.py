@@ -95,9 +95,14 @@ def printPlayers(screen, cardsList, myFont, tableButton):
         card_coords = uno_back_coords(baseAngle, tableButton, cardsList, i+1)
         screen.blit(cardsList['unoBack'],card_coords)
 
-        playerLabel = myFont[1].render(player, 1, (0,0,0))
+        LIGHT_RED = (255,204,203)
+        LIGHT_GREEN = (144,238,144)
+
+        bg_color = LIGHT_GREEN if player == cc.playerTurn else LIGHT_RED
+
+        playerLabel = myFont[1].render(f' {player} : {cc.players[player]} ', 1, (0,0,0), bg_color)
         x = card_coords[0] + cardsList['unoBack'].get_width()/2 - playerLabel.get_width()/2
-        y = card_coords[1] + cardsList['unoBack'].get_height() + 5
+        y = card_coords[1] + cardsList['unoBack'].get_height() + 2
         screen.blit(playerLabel, (x,y))
 
 
@@ -116,7 +121,7 @@ def display(screen, tableButton, cardsList, gameplayImg,myFont):
     cardDisplay(screen, cardsList, cc.top_card)
     printHand(screen, cardsList)
 
-    if cc.playerTurn is True:
+    if cc.playerTurn == cc.playerName:
         button.Button(10, 10, gameplayImg['yourTurn'], 0.2).draw(screen)
     else:
         button.Button(10, 10, gameplayImg['notYourTurn'], 0.2).draw(screen)

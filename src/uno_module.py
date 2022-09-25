@@ -142,6 +142,12 @@ class Deck:
 
         random.shuffle(self.deck)
 
+    def size(self):
+        '''
+        Returns size of Deck.
+        '''
+        return len(self.deck)
+
 
 
 class Stack:
@@ -208,6 +214,12 @@ class Stack:
         for i in self.stack:
             lst.append(i.conv())
         return ','.join(lst)
+
+    def size(self):
+        '''
+        Returns size of Stack.
+        '''
+        return len(self.stack)
 
 
 

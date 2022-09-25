@@ -54,6 +54,7 @@ def encode(dct):
               str(dct['eventID']) + ":" + 
               str(dct['drawnCards']) + ":" + 
               str(dct['playerTurn']) + ":" + 
+              str(dct['players']) + ':' + 
               str(dct['winner']) + ":" + 
               str(dct['chosenColour']))
     return string
@@ -75,19 +76,26 @@ def database(name='0', eventID=0, drawnCards='00'):
     '''
     stores data for all clients to take from
     '''
+
+    # creating playername=handsize once
+    players = []
+    for player in config.myPlayers:
+        player = [player['name'], str(player['hand'].size())]
+        players.append('='.join(player))
+    
+    players = ','.join(players) # reusing the same variable
+
     dct = {}
     for i in range(len(config.myPlayers)):
-        playerTurn = 0
-        if name == config.myPlayers[i]['name']:
-            playerTurn = 1
-        else:
+        if name != config.myPlayers[i]['name']:
             eventID = 0
             drawnCards = '00'
         dct[config.myPlayers[i]['name']] = {'topCard': config.myDiscard_pile.stack[-1].conv(),
                                             'hand': config.myPlayers[i]['hand'].conv(),
                                             'eventID': eventID,
-                                            'playerTurn': playerTurn,
+                                            'playerTurn': name,
                                             'drawnCards': drawnCards,
+                                            'players': players,
                                             'winner': config.Winner,
                                             'chosenColour': config.assumedColour}
     return dct
