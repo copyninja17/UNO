@@ -67,7 +67,7 @@ def uno_back_coords(baseAngle ,tableButton, cardsList, index):
     
     x = (SCREEN_WIDTH/2 - tableButton.width/2*1) * math.cos(angle) + SCREEN_WIDTH/2 - cardsList['unoBack'].get_width()/2
     y = SCREEN_HEIGHT/2 - (tableButton.height/2*1) * math.sin(angle) - cardsList['unoBack'].get_height()
-    
+
     return (x,y)
 
 
@@ -93,6 +93,9 @@ def printPlayers(screen, cardsList, myFont, tableButton):
     
     for i, player in enumerate(cc.playerList[:-1]):
         card_coords = uno_back_coords(baseAngle, tableButton, cardsList, i+1)
+        if player == cc.playerTurn:
+            card_coords = (card_coords[0], card_coords[1] + math.sin(cc.cardAnimationAngle)*5)
+            cc.cardAnimationAngle += 1 * 0.15
         screen.blit(cardsList['unoBack'],card_coords)
 
         LIGHT_RED = (255,204,203)

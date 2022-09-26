@@ -18,3 +18,5 @@ receivedPlayerList = False
 playerList = []
 playerCount = 0
 players = {}
+playerAngle = 0
+cardAnimationAngle = 0
