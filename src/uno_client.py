@@ -50,7 +50,6 @@ class Client:
         else:
             # game data received
             try:
-                print(data)                     # DEBUGGING
                 top_card = uno.Card()
                 top_card.generate(data.split(':')[0][-1], data.split(':')[0][:-1])
 
@@ -77,6 +76,9 @@ class Client:
                 players = {}
                 for player in data.split(':')[5].split(','):
                     players[player.split('=')[0]] = player.split('=')[1]
+                    
+                if not cc.old_card_dict:
+                    cc.old_card_dict = players.copy()
 
                 winner = data.split(':')[6]
 
@@ -100,7 +102,7 @@ class Client:
         '''
         Sends data to server and returns reply.
 
-        ontTime: If True, exchanges playerName with playerList.
+        oneTime: If True, exchanges playerName with playerList.
         '''
 
         if oneTime:

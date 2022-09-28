@@ -62,16 +62,16 @@ def printHand(screen,cardsList):
         print(e)
 
 
-def uno_back_coords(baseAngle ,tableButton, cardsList, index):
+def uno_back_coords(baseAngle ,tables, cardsList, index):
     angle = math.radians(index * cc.playerAngle + baseAngle)
     
-    x = (SCREEN_WIDTH/2 - tableButton.width/2*1) * math.cos(angle) + SCREEN_WIDTH/2 - cardsList['unoBack'].get_width()/2
-    y = SCREEN_HEIGHT/2 - (tableButton.height/2*1) * math.sin(angle) - cardsList['unoBack'].get_height()
+    x = (SCREEN_WIDTH/2 - tables[0].get_width()/2*1) * math.cos(angle) + SCREEN_WIDTH/2 - cardsList['unoBack'].get_width()/2
+    y = SCREEN_HEIGHT/2 - (tables[0].get_height()/2*1) * math.sin(angle) - cardsList['unoBack'].get_height()
 
     return (x,y)
 
 
-def printPlayers(screen, cardsList, myFont, tableButton):
+def printPlayers(screen, cardsList, myFont, tables):
     if cc.playerCount == 2:
         baseAngle = 0
         cc.playerAngle = 90
@@ -92,7 +92,7 @@ def printPlayers(screen, cardsList, myFont, tableButton):
         return
     
     for i, player in enumerate(cc.playerList[:-1]):
-        card_coords = uno_back_coords(baseAngle, tableButton, cardsList, i+1)
+        card_coords = uno_back_coords(baseAngle, tables, cardsList, i+1)
         if player == cc.playerTurn:
             card_coords = (card_coords[0], card_coords[1] + math.sin(cc.cardAnimationAngle)*5)
             cc.cardAnimationAngle += 1 * 0.15
@@ -109,7 +109,7 @@ def printPlayers(screen, cardsList, myFont, tableButton):
         screen.blit(playerLabel, (x,y))
 
 
-def display(screen, tableButton, cardsList, gameplayImg,myFont):
+def display(screen, tables, cardsList, gameplayImg,myFont):
     if cc.winner !='NONE':
         winnerName = f"YOU ARE THE WINNER!!" if cc.winner == cc.playerName else f"WINNER IS {cc.winner}!"
         winnerLabel = myFont[2].render(winnerName, 1, (0,0,0))
@@ -119,8 +119,23 @@ def display(screen, tableButton, cardsList, gameplayImg,myFont):
         screen.blit(winnerLabel, (x,y))
         return
 
-    tableButton.draw(screen)
-    printPlayers(screen, cardsList, myFont, tableButton)
+    # flip table on screen
+    if cc.playerCount <= 2:
+        cc.table_direction = 0
+
+    elif ((cc.top_card.card['val'] == 'reverse') and 
+        (cc.players != cc.old_card_dict) and 
+        (sum(list(map(int, cc.players.values()))) <= sum(list(map(int, cc.old_card_dict.values()))))):
+        print("reversed table!")
+        cc.table_direction *= -1
+
+    screen.blit(tables[cc.table_direction], (SCREEN_WIDTH/2 - tables[0].get_width()/2*1,
+                            SCREEN_HEIGHT/2 - tables[0].get_height()/2*1))
+
+    cc.old_card_dict = cc.players
+
+    # display cards on table
+    printPlayers(screen, cardsList, myFont, tables)
     cardDisplay(screen, cardsList, cc.top_card)
     printHand(screen, cardsList)
 

@@ -141,7 +141,8 @@ def prepare():
 
 def Deal(n):
     '''
-    deals cards to players from deck
+    Deals cards to players from deck.
+    Also refills deck from discard pile.
     '''
     dealt_cards = []
     rem = n
@@ -164,9 +165,8 @@ def threaded_server():
             if roomSize == len(config.myPlayerList):    prepare()
             else:                                       continue
 
-            # if config.Winner != 'NONE':                 config.SERVER_EXIT = True
-            
             print(f"it's {config.myPlayers[0]['name']} turn")
+
             if config.actionEffect == False:
                 copied_hand = uno.Stack()
                 lst = list(config.myPlayers[0]['hand'].stack)
@@ -206,8 +206,13 @@ def threaded_server():
                                 print(f"Winner is {config.myPlayers[0]['name']}!!")
                                 config.Winner = str(config.myPlayers[0]['name'])
                                 # config.SERVER_EXIT = True
-                                config.myPlayers[0]['hand'].add(config.myDiscard_pile.deal(0, 0))
+                                config.myPlayers[0]['hand'].add(config.myDiscard_pile.deal(0,0))
                             break
+
+                    if uno.isAction(config.myDiscard_pile.stack[-1]) == 'rev':
+                        config.actionEffect = False
+                        config.myPlayers.reverse()
+                        continue
 
                 else:
                     # no cards situation
@@ -223,11 +228,6 @@ def threaded_server():
                         if colour == 'N':  # N = Nil[client has received data]
                             print(f"{config.myPlayers[0]['name']} HAS RECEIVED")
                             break
-
-                if uno.isAction(config.myDiscard_pile.stack[-1]) == 'rev':
-                    config.actionEffect = False
-                    config.myPlayers.reverse()
-                    continue
 
                 config.myPlayers.append(config.myPlayers.pop(0))
 

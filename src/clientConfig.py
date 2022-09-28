@@ -20,3 +20,5 @@ playerCount = 0
 players = {}
 playerAngle = 0
 cardAnimationAngle = 0
+table_direction = -1
+old_card_dict = {}

@@ -163,11 +163,10 @@ waitinglobbyButton = button.Button(SCREEN_WIDTH/2-waitinglobbyImg.get_width()/2*
 # game room
 # -----------------------------------
 
-tableImg = pygame.image.load('assets/textures/uno_table.png').convert_alpha()
-tableButton = button.Button(SCREEN_WIDTH/2 - tableImg.get_width()/2*1,
-                            SCREEN_HEIGHT/2 - tableImg.get_height()/2*1,
-                            tableImg,
-                            1)
+tables = [0]*3
+tables[0] = pygame.image.load('assets/textures/uno_table.png').convert_alpha()
+tables[1] = pygame.image.load('assets/textures/uno_table_clockwise.png').convert_alpha()
+tables[2] = pygame.image.load('assets/textures/uno_table_anticlockwise.png').convert_alpha()
 
 colours = ['red', 'green', 'blue', 'yellow']
 cardsList = {}
@@ -263,7 +262,7 @@ while run:
             config.Page = 5
 
     elif config.Page == 5:
-        startGame.display(screen, tableButton, cardsList, gameplayImg, myFont)
+        startGame.display(screen, tables, cardsList, gameplayImg, myFont)
 
     if config.waitingTime:
         pygame.time.wait(config.waitingTime)
