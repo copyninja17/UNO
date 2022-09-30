@@ -183,6 +183,10 @@ for colour in colours:
         f'assets/textures/cards/{colour}/{colour}Rev.png').convert_alpha())
     cardsList[colour[0].upper()].append(pygame.image.load(
         f'assets/textures/cards/{colour}/{colour}Skip.png').convert_alpha())
+    cardsList[colour[0].upper()].append(pygame.image.load(
+        f'assets/textures/cards/{colour}/{colour}+4.png').convert_alpha())
+    cardsList[colour[0].upper()].append(pygame.image.load(
+        f'assets/textures/cards/{colour}/{colour}wild.png').convert_alpha())
 
 cardsList['X'] = []
 cardsList['X'].append(pygame.image.load(

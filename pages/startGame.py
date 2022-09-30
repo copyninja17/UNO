@@ -33,11 +33,14 @@ def cardDisplay(screen, cardsList, currCard, x=-1, y=-1):
     if x == -1:
         x = SCREEN_WIDTH/2 - cardsList['R'][0].get_width()/2*CARD_SIZE
         y = SCREEN_HEIGHT/2 - cardsList['R'][0].get_height()/2*CARD_SIZE
-    # find the image
+        
+        if val in [0,1] and cc.chosenColour in ['R', 'B', 'G', 'Y']:
+            col = cc.chosenColour
+            val = 13 if val == 0 else 14
+
     if button.Button(x,y,cardsList[col][val], CARD_SIZE).draw(screen):
         cc.currentChoice = currCard
 
-    # make a new button
 
 def printHand(screen,cardsList):
     try:
