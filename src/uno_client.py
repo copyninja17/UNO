@@ -159,6 +159,8 @@ def display(addrPort):
                 print(f"\nWinner is {cc.winner}\n")
                 break
 
+            cc.event = ''
+
             # # prints top card
             # print("\n+" + "-"*(13+len(top_card.show())) + "+")
             print("|" + f" Top card = {cc.top_card.show()} " + "|")
@@ -190,6 +192,8 @@ def display(addrPort):
                             # print(f"Card played: {cc.playable_cards.stack[played_card-1].show()}")
                             if cc.playable_cards.stack[played_card-1].card['colour'] == 'X':
                                 cc.colourChange = 0
+                                cc.event = 'colour_change'
+
                                 while True:
                                     if cc.colourChange in ['R','B','G','Y']:
                                         client.colour = cc.colourChange
@@ -208,6 +212,8 @@ def display(addrPort):
                 elif client.event[cc.eventID] == 'no_cards':
                     print(f"Your turn {client.playerName}:")
                     print("You have no playable cards")
+                    cc.event = 'no_cards'
+
                     cc.okPrompt = 0
                     while True:
                         if cc.okPrompt == 1:
@@ -220,6 +226,7 @@ def display(addrPort):
                 elif client.event[cc.eventID] == '+4/+2':
                     print(f"+{len(cc.drawn_cards.stack)} was used on you")
                     print(f"Cards drawn: {cc.drawn_cards.show()}")
+                    cc.event = f'+{len(cc.drawn_cards.stack)}'
 
                     cc.okPrompt = 0
                     while True:
@@ -232,6 +239,7 @@ def display(addrPort):
 
                 elif client.event[cc.eventID] == 'skip':
                     print("Your turn was skipped.")
+                    cc.event = 'skip'
 
                     cc.okPrompt = 0
                     while True:

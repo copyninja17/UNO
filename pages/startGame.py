@@ -4,15 +4,27 @@ from src import button
 import math
 
 
+SCREEN_WIDTH = 1000
+SCREEN_HEIGHT = 600 #450
+CARD_SIZE = 1.0
+
 R = 'red'
 B = 'blue'
 G = 'green'
 Y = 'yellow'
 X = 'X'
 colours = [R,B,G,Y,X]
-SCREEN_WIDTH = 1000
-SCREEN_HEIGHT = 600 #450
-CARD_SIZE = 1.0
+
+event_dct = {   'no_cards' : ' You have no cards ',
+                'skip' : ' Your turn was skipped! ',
+                '+2' : ' Draw two cards ',
+                '+4' : ' Draw four cards ',
+                'colour_change' : ' Pick a colour! '
+            }
+LIGHT_RED = (255,204,203)
+LIGHT_GREEN = (144,238,144)
+DARK_BG = (159, 179, 190)
+
 
 def cardDisplay(screen, cardsList, currCard, x=-1, y=-1):
 
@@ -101,9 +113,6 @@ def printPlayers(screen, cardsList, myFont, tables):
             cc.cardAnimationAngle += 1 * 0.15
         screen.blit(cardsList['unoBack'],card_coords)
 
-        LIGHT_RED = (255,204,203)
-        LIGHT_GREEN = (144,238,144)
-
         bg_color = LIGHT_GREEN if player == cc.playerTurn else LIGHT_RED
 
         playerLabel = myFont[1].render(f' {player} : {cc.players[player]} ', 1, (0,0,0), bg_color)
@@ -148,25 +157,31 @@ def display(screen, tables, cardsList, gameplayImg,myFont):
         button.Button(10, 10, gameplayImg['notYourTurn'], 0.2).draw(screen)
 
     if cc.okPrompt == 0:
-        if button.Button(SCREEN_WIDTH-gameplayImg['ok'].get_width()*0.25 -10,
+        event_label = myFont[1].render(event_dct[cc.event], 1, (0,0,0), DARK_BG)
+
+        x = SCREEN_WIDTH - event_label.get_width() - 50
+        y = 50
+        screen.blit(event_label, (x,y))
+
+        if button.Button(SCREEN_WIDTH-gameplayImg['ok'].get_width()*0.25 - 10,
                          SCREEN_HEIGHT/2-gameplayImg['ok'].get_height()/2*0.25,
                          gameplayImg['ok'], 0.25).draw(screen):
             cc.okPrompt = 1
 
     if cc.colourChange == 0:
-        if button.Button(SCREEN_WIDTH-2*gameplayImg['pick']['red'].get_width()*0.4 -10,
-                         SCREEN_HEIGHT/2-gameplayImg['pick']['red'].get_height()/2*0.4,
-                         gameplayImg['pick']['red'], 0.4).draw(screen):
+        if button.Button(SCREEN_WIDTH-2*gameplayImg['pick']['red'].get_width()*0.5 - 35,
+                         SCREEN_HEIGHT/2-gameplayImg['pick']['red'].get_height()/2*0.5,
+                         gameplayImg['pick']['red'], 0.5).draw(screen):
             cc.colourChange = 'R'
-        elif button.Button(SCREEN_WIDTH-gameplayImg['pick']['blue'].get_width()*0.4 -10, 
-                           SCREEN_HEIGHT/2-gameplayImg['pick']['blue'].get_height()/2*0.4, 
-                           gameplayImg['pick']['blue'], 0.4).draw(screen):
+        elif button.Button(SCREEN_WIDTH-gameplayImg['pick']['blue'].get_width()*0.5 - 30, 
+                           SCREEN_HEIGHT/2-gameplayImg['pick']['blue'].get_height()/2*0.5, 
+                           gameplayImg['pick']['blue'], 0.5).draw(screen):
             cc.colourChange = 'B'
-        elif button.Button(SCREEN_WIDTH-2*gameplayImg['pick']['yellow'].get_width()*0.4 -10, 
-                           SCREEN_HEIGHT/2+gameplayImg['pick']['yellow'].get_height()/2*0.4, 
-                           gameplayImg['pick']['yellow'], 0.4).draw(screen):
+        elif button.Button(SCREEN_WIDTH-2*gameplayImg['pick']['yellow'].get_width()*0.5 - 35, 
+                           SCREEN_HEIGHT/2+gameplayImg['pick']['yellow'].get_height()/2*0.5 + 5, 
+                           gameplayImg['pick']['yellow'], 0.5).draw(screen):
             cc.colourChange = 'Y'
-        elif button.Button(SCREEN_WIDTH-gameplayImg['pick']['green'].get_width()*0.4 -10, 
-                           SCREEN_HEIGHT/2+gameplayImg['pick']['green'].get_height()/2*0.4, 
-                           gameplayImg['pick']['green'], 0.4).draw(screen):
+        elif button.Button(SCREEN_WIDTH-gameplayImg['pick']['green'].get_width()*0.5 - 30, 
+                           SCREEN_HEIGHT/2+gameplayImg['pick']['green'].get_height()/2*0.5 + 5, 
+                           gameplayImg['pick']['green'], 0.5).draw(screen):
             cc.colourChange = 'G'
