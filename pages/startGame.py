@@ -5,7 +5,7 @@ import math
 
 
 SCREEN_WIDTH = 1000
-SCREEN_HEIGHT = 600 #450
+SCREEN_HEIGHT = 600
 CARD_SIZE = 1.0
 
 R = 'red'
@@ -15,10 +15,10 @@ Y = 'yellow'
 X = 'X'
 colours = [R,B,G,Y,X]
 
-event_dct = {   'no_cards' : ' You have no cards ',
+event_dct = {   'no_cards' : ' You have no cards, one card added ',
                 'skip' : ' Your turn was skipped! ',
-                '+2' : ' Draw two cards ',
-                '+4' : ' Draw four cards ',
+                '+2' : ' Two cards drawn ',
+                '+4' : ' Four cards drawn ',
                 'colour_change' : ' Pick a colour! '
             }
 LIGHT_RED = (255,204,203)
@@ -156,6 +156,7 @@ def display(screen, tables, cardsList, gameplayImg,myFont):
     else:
         button.Button(10, 10, gameplayImg['notYourTurn'], 0.2).draw(screen)
 
+    # handle 'OK' button for events
     if cc.okPrompt == 0:
         event_label = myFont[1].render(event_dct[cc.event], 1, (0,0,0), DARK_BG)
 
@@ -163,25 +164,26 @@ def display(screen, tables, cardsList, gameplayImg,myFont):
         y = 50
         screen.blit(event_label, (x,y))
 
-        if button.Button(SCREEN_WIDTH-gameplayImg['ok'].get_width()*0.25 - 10,
-                         SCREEN_HEIGHT/2-gameplayImg['ok'].get_height()/2*0.25,
+        if button.Button(SCREEN_WIDTH-gameplayImg['ok'].get_width()*0.25 - 50,
+                         SCREEN_HEIGHT/5-gameplayImg['ok'].get_height()/2*0.25,
                          gameplayImg['ok'], 0.25).draw(screen):
             cc.okPrompt = 1
 
+    # 'change colours' buttons
     if cc.colourChange == 0:
-        if button.Button(SCREEN_WIDTH-2*gameplayImg['pick']['red'].get_width()*0.5 - 35,
-                         SCREEN_HEIGHT/2-gameplayImg['pick']['red'].get_height()/2*0.5,
+        if button.Button(SCREEN_WIDTH - 2*gameplayImg['pick']['red'].get_width() * 0.5 - 35,
+                         SCREEN_HEIGHT/2 - gameplayImg['pick']['red'].get_height() / 2 * 0.5,
                          gameplayImg['pick']['red'], 0.5).draw(screen):
             cc.colourChange = 'R'
-        elif button.Button(SCREEN_WIDTH-gameplayImg['pick']['blue'].get_width()*0.5 - 30, 
-                           SCREEN_HEIGHT/2-gameplayImg['pick']['blue'].get_height()/2*0.5, 
+        elif button.Button(SCREEN_WIDTH - gameplayImg['pick']['blue'].get_width() * 0.5 - 30, 
+                           SCREEN_HEIGHT/2 - gameplayImg['pick']['blue'].get_height()/2 * 0.5, 
                            gameplayImg['pick']['blue'], 0.5).draw(screen):
             cc.colourChange = 'B'
-        elif button.Button(SCREEN_WIDTH-2*gameplayImg['pick']['yellow'].get_width()*0.5 - 35, 
-                           SCREEN_HEIGHT/2+gameplayImg['pick']['yellow'].get_height()/2*0.5 + 5, 
+        elif button.Button(SCREEN_WIDTH - 2*gameplayImg['pick']['yellow'].get_width() * 0.5 - 35, 
+                           SCREEN_HEIGHT/2 + gameplayImg['pick']['yellow'].get_height()/2 * 0.5 + 5, 
                            gameplayImg['pick']['yellow'], 0.5).draw(screen):
             cc.colourChange = 'Y'
-        elif button.Button(SCREEN_WIDTH-gameplayImg['pick']['green'].get_width()*0.5 - 30, 
-                           SCREEN_HEIGHT/2+gameplayImg['pick']['green'].get_height()/2*0.5 + 5, 
+        elif button.Button(SCREEN_WIDTH - gameplayImg['pick']['green'].get_width()*0.5 - 30, 
+                           SCREEN_HEIGHT/2+gameplayImg['pick']['green'].get_height()/2 * 0.5 + 5, 
                            gameplayImg['pick']['green'], 0.5).draw(screen):
             cc.colourChange = 'G'

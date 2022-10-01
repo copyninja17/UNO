@@ -13,7 +13,7 @@ config.platform = platform.system()
 pygame.init()
 
 # create display window
-SCREEN_HEIGHT = 600 #450
+SCREEN_HEIGHT = 600
 SCREEN_WIDTH = 1000
 TEXTBOX_WIDTH = 272
 TEXTBOX_HEIGHT = 35
