@@ -14,20 +14,21 @@ import sys
 import os
 import logging
 from datetime import datetime
+from pathlib import Path as PATH
 
 
 try:
-    os.mkdir("logs")
+    os.mkdir(f"{PATH(__file__).parent.absolute()}/logs")
 except:
     pass
 
 d1 = (f"{datetime.now().year}_{datetime.now().month}_{datetime.now().day}")
 i = 0
 while True:
-    if f'server_{d1}_{i}.log' in os.listdir("logs"):
+    if f'server_{d1}_{i}.log' in os.listdir(f"{PATH(__file__).parent.absolute()}/logs"):
         i+=1
     else:
-        logname = f'logs/server_{d1}_{i}.log'
+        logname = f'{PATH(__file__).parent.absolute()}/logs/server_{d1}_{i}.log'
         break
 
 logging.basicConfig(filename=logname,
@@ -35,6 +36,7 @@ logging.basicConfig(filename=logname,
                     format="[ {asctime} ][ {levelname} ] {message}",
                     level=logging.DEBUG,
                     style='{')
+
 # local declarations
 currentId = "0"
 
