@@ -11,8 +11,30 @@ import socket
 from _thread import *
 import threading
 import sys
+import os
+import logging
+from datetime import datetime
 
 
+try:
+    os.mkdir("logs")
+except:
+    pass
+
+d1 = (f"{datetime.now().year}_{datetime.now().month}_{datetime.now().day}")
+i = 0
+while True:
+    if f'server_{d1}_{i}.log' in os.listdir("logs"):
+        i+=1
+    else:
+        logname = f'logs/server_{d1}_{i}.log'
+        break
+
+logging.basicConfig(filename=logname,
+                    filemode='a',
+                    format="[ {asctime} ][ {levelname} ] {message}",
+                    level=logging.DEBUG,
+                    style='{')
 # local declarations
 currentId = "0"
 
@@ -27,12 +49,12 @@ try:
     s.bind((server, port))
 
 except socket.error as e:
-    print(str(e))
+    logging.error(str(e))
 
 roomSize = int(sys.argv[1])
 
 s.listen(roomSize)
-print("Waiting for a connection")
+logging.info("Waiting for a connection")
 
 
 def parse(message):
@@ -77,7 +99,7 @@ def database(name='0', eventID=0, drawnCards='00'):
     stores data for all clients to take from
     '''
 
-    # creating playername=handsize once
+    # creating 'playername=handsize' string once
     players = []
     for player in config.myPlayers:
         player = [player['name'], str(player['hand'].size())]
@@ -106,7 +128,7 @@ def prepare():
     '''
     preapares stuff before starting server
     '''
-    print("preparing")
+    logging.info("Preparing cards")
 
     for i in range(roomSize):
         sample_dict = {'name': 0, 'hand': 0}
@@ -115,14 +137,13 @@ def prepare():
         stack.add(config.myDeck.deal(7))
         sample_dict['hand'] = stack
         config.myPlayers.append(sample_dict)
-    print("config.myPlayers ready")
+    logging.info("config.myPlayers ready")
 
     # doesn't allow +4 on first turn
     while True:
         if config.myDeck.deck[0].card['colour'] == 'X':
             config.myDeck.shuffle()
         else:
-            print("wild clause")
             break
     
     config.myDiscard_pile.add(config.myDeck.deal(1))
@@ -131,12 +152,12 @@ def prepare():
     for i in config.myPlayerList:
         sample_dict = {'choice': '0', 'colour': '0'}
         config.myReplies[i] = sample_dict
-    print("config.myReplies ready")
+    logging.info("config.myReplies ready")
 
     config.myStorage = database()
 
     config.myPreparations_complete = True
-    print("preparations complete")
+    logging.info("Preparations complete")
 
 
 def Deal(n):
@@ -165,7 +186,7 @@ def threaded_server():
             if roomSize == len(config.myPlayerList):    prepare()
             else:                                       continue
 
-            print(f"it's {config.myPlayers[0]['name']} turn")
+            logging.info(f"It's {config.myPlayers[0]['name']} turn")
 
             if config.actionEffect == False:
                 copied_hand = uno.Stack()
@@ -176,14 +197,14 @@ def threaded_server():
                     config.myDiscard_pile.stack[-1], copied_hand, config.assumedColour)
 
                 if playable_cards != 'None':
-                    print(f"{config.myPlayers[0]['name']} has playable cards")
+                    logging.info(f"{config.myPlayers[0]['name']} has playable cards")
                     config.myStorage = database(config.myPlayers[0]['name'], 1)
                     while True:
                         # trapping until input is recieved
                         choice = int(
                             config.myReplies[config.myPlayers[0]['name']]['choice'])
                         if choice != 0:
-                            print(f"{config.myPlayers[0]['name']} HAS CHOSEN")
+                            logging.info(f"{config.myPlayers[0]['name']} has chosen a card")
                             config.assumedColour = config.myReplies[config.myPlayers[0]
                                                                     ['name']]['colour']
                             played_card = choice-1
@@ -191,19 +212,18 @@ def threaded_server():
                                 playable_cards.deal(0, played_card))
                             copied_hand.add(playable_cards.stack)
                             config.myPlayers[0]['hand'].clear()
+
                             # at this point we have successfully played the card
                             config.myPlayers[0]['hand'].add(copied_hand.stack)
-                            print(
-                                f"remaining hand: {config.myPlayers[0]['hand'].show()}")
-                            print(
-                                f"hand length = {len(config.myPlayers[0]['hand'].stack)}")
+                            logging.info(f"remaining hand: {config.myPlayers[0]['hand'].show()}")
+                            logging.info(f"hand length = {len(config.myPlayers[0]['hand'].stack)}")
 
                             if (uno.isAction(config.myDiscard_pile.stack[-1]) != 'None' and 
                                 config.myDiscard_pile.stack[-1].card['val'] != 'wild'):
                                 config.actionEffect = True
 
                             if len(config.myPlayers[0]['hand'].stack) == 0:
-                                print(f"Winner is {config.myPlayers[0]['name']}!!")
+                                logging.info(f"Winner is {config.myPlayers[0]['name']}!!")
                                 config.Winner = str(config.myPlayers[0]['name'])
                                 # config.SERVER_EXIT = True
                                 config.myPlayers[0]['hand'].add(config.myDiscard_pile.deal(0,0))
@@ -216,7 +236,7 @@ def threaded_server():
 
                 else:
                     # no cards situation
-                    print(f"{config.myPlayers[0]['name']} has NO playable cards")
+                    logging.info(f"{config.myPlayers[0]['name']} has NO playable cards")
                     config.myPlayers[0]['hand'].add(Deal(1))
 
                     config.myStorage = database(config.myPlayers[0]['name'], 2, 
@@ -226,14 +246,13 @@ def threaded_server():
                         # trapping until input is recieved
                         colour = config.myReplies[config.myPlayers[0]['name']]['colour']
                         if colour == 'N':  # N = Nil[client has received data]
-                            print(f"{config.myPlayers[0]['name']} HAS RECEIVED")
+                            logging.info(f"{config.myPlayers[0]['name']} has received his card")
                             break
 
                 config.myPlayers.append(config.myPlayers.pop(0))
 
             else:
-                print(
-                    f"{config.myPlayers[0]['name']} is facing an action situation")
+                logging.info(f"{config.myPlayers[0]['name']} is facing an action situation")
 
                 # write action code
                 if uno.isAction(config.myDiscard_pile.stack[-1]) == 'skp':
@@ -244,7 +263,7 @@ def threaded_server():
                         # trapping until input is recieved
                         colour = config.myReplies[config.myPlayers[0]['name']]['colour']
                         if colour == 'N':  # N = Nil[client has received data]
-                            print(f"{config.myPlayers[0]['name']} HAS RECEIVED")
+                            logging.info(f"{config.myPlayers[0]['name']} has agreed")
                             break
                     config.myPlayers.append(config.myPlayers.pop(0))
 
@@ -259,7 +278,7 @@ def threaded_server():
                         # trapping until input is recieved
                         colour = config.myReplies[config.myPlayers[0]['name']]['colour']
                         if colour == 'N':  # N = Nil[client has received data]
-                            print(f"{config.myPlayers[0]['name']} HAS RECEIVED")
+                            logging.info(f"{config.myPlayers[0]['name']} has received 2 cards")
                             break
                     config.myPlayers.append(config.myPlayers.pop(0))
 
@@ -277,7 +296,7 @@ def threaded_server():
                         colour = config.myReplies[config.myPlayers[0]
                                                 ['name']]['colour']
                         if colour == 'N':  # N = Nil[client has received data]
-                            print(f"{config.myPlayers[0]['name']} HAS RECEIVED")
+                            logging.info(f"{config.myPlayers[0]['name']} has received four cards")
                             break
                     config.myPlayers.append(config.myPlayers.pop(0))
 
@@ -323,7 +342,7 @@ def threaded_client(conn):
                         config.myStorage[name]['playerTurn'] = '0'
                         config.myStorage[name]['eventID'] = '0'
                         reply = encode(config.myStorage[name])
-                        print(f"Latest reply = {reply}")
+                        logging.info(f"Data sent to name: {reply}")
                     else:
                         reply = encode(config.myStorage[name])
 
@@ -333,16 +352,16 @@ def threaded_client(conn):
                     while True:  # trap until all Players join
                         if ((len(config.myPlayerList) == roomSize) and 
                             config.myPreparations_complete):
-                            reply = ",".join(config.myPlayerList)
-                            print(f"Sending to : " + reply)
+                            reply = ','.join(config.myPlayerList)
+                            logging.info(f"Sending playerList: {reply}")
                             break
                         elif len(config.myPlayerList) != config.playerCount:
-                            print(
+                            logging.info(
                                 f"config.myPlayers joined({len(config.myPlayerList)}/{roomSize})")
-                            print("Waiting...")
+                            logging.info("Waiting...")
                             config.playerCount = len(config.myPlayerList)
                             
-                    print(f"Sending to {name}: {reply}")
+                    logging.info(f"Sending to {name}: {reply}")
 
                 conn.sendall(str.encode(reply))
 
@@ -350,11 +369,11 @@ def threaded_client(conn):
             config.SERVER_EXIT = True
             break
         except Exception as e:
-            print("break from threaded_client")
-            print(e)
+            logging.error("Break from threaded_client")
+            logging.error(e)
             raise
 
-    print("Connection Closed")
+    logging.warning(f"Connection Closed for {name}")
     conn.close()
 
 
@@ -364,9 +383,9 @@ while True:
     '''
     try:
         conn, addr = s.accept()
-        print("Connected to: ", addr)
+        logging.info(f"Connected to: {addr}")
         start_new_thread(threaded_client, (conn,))
     except KeyboardInterrupt:
-        print("server closed")
+        logging.info("server closed")
         config.SERVER_EXIT = True
         break
