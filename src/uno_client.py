@@ -267,7 +267,7 @@ def display(addrPort):
 def start():
     if cc.host is True:
         if config.platform == 'Windows':
-            subprocess.Popen([sys.executable, f'src/uno_server.py', f'{config.settings}'],
+            subprocess.Popen([sys.executable, f'src/uno_server.py', f'{cc.settings}'],
                             creationflags=subprocess.CREATE_NEW_CONSOLE)
         # else:
             # subprocess.Popen(['python3.10', f'src/uno_server.py', f'{config.settings}'],
@@ -279,4 +279,4 @@ def start():
         # print("exec")
         
     elif cc.host is False:
-        threading.Thread(target=display, args=(config.settings,)).start()
+        threading.Thread(target=display, args=(cc.settings,)).start()

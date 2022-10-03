@@ -315,7 +315,7 @@ while run:
                 uno_client.start()
 
             elif cc.page == 2:
-                config.settings = textinputCustom.value
+                cc.settings = textinputCustom.value
                 print(f"Entered Address = {enteredAddress}")
                 cc.lastPage = cc.page
                 cc.page = 3
