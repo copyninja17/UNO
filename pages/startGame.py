@@ -2,7 +2,11 @@ from src import clientConfig as cc
 from src import button
 
 import math
+import logging
 
+
+
+logger = logging.getLogger("client")
 
 SCREEN_WIDTH = 1000
 SCREEN_HEIGHT = 600
@@ -74,7 +78,7 @@ def printHand(screen,cardsList):
             
             cardDisplay(screen, cardsList, cc.player_hand.stack[i], x, y)
     except Exception as e:
-        print(e)
+        logging.error(e)
 
 
 def uno_back_coords(baseAngle ,tables, cardsList, index):
@@ -138,7 +142,7 @@ def display(screen, tables, cardsList, gameplayImg,myFont):
     elif ((cc.top_card.card['val'] == 'reverse') and 
         (cc.players != cc.old_card_dict) and 
         (sum(list(map(int, cc.players.values()))) <= sum(list(map(int, cc.old_card_dict.values()))))):
-        print("reversed table!")
+        logging.info("reversed table!")
         cc.table_direction *= -1
 
     screen.blit(tables[cc.table_direction], (SCREEN_WIDTH/2 - tables[0].get_width()/2*1,

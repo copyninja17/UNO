@@ -1,5 +1,7 @@
 from src import clientConfig as cc
+import logging
 
+logging.getLogger("client")
 
 def display(screen, roomSizeButtons, roomSizeButtonsFinal, roomSizeNames):
     for i in range(3):

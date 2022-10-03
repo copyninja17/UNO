@@ -6,7 +6,32 @@ from src import clientConfig as cc
 
 import pygame
 import platform
+import os
+import logging
+from datetime import datetime
+from pathlib import Path as PATH
 
+
+try:
+    os.mkdir(f"{PATH(__file__).parent.absolute()}/logs")
+except:
+    pass
+
+d1 = (f"{datetime.now().year}_{datetime.now().month}_{datetime.now().day}")
+i = 0
+while True:
+    if f'client_{d1}_{i}.log' in os.listdir(f"{PATH(__file__).parent.absolute()}/logs"):
+        i+=1
+    else:
+        logname = f'{PATH(__file__).parent.absolute()}/logs/client_{d1}_{i}.log'
+        break
+
+logging.basicConfig(filename=logname,
+                    filemode='a',
+                    format="[ {asctime} ][ {levelname} ][ {filename} ] {message}",
+                    level=logging.DEBUG,
+                    style='{')
+logger = logging.getLogger("client")
 
 config.platform = platform.system()
 
@@ -304,11 +329,11 @@ while run:
         if event.type == pygame.KEYDOWN and event.key == pygame.K_RETURN:
             if cc.page == 3:
                 cc.playerName = textinputName.value.upper()
-                print(f"Name = {cc.playerName}")
+                logger.info(f"Name = {cc.playerName}")
                 if len(cc.playerName) < 3 or not cc.playerName.isalnum():
                     textinputName.value = ''
                     cc.playerName = ''
-                    print("playername refreshed")
+                    logger.info("playername refreshed")
                     playerName_error = True
                     break
                 cc.page = 4
@@ -316,7 +341,7 @@ while run:
 
             elif cc.page == 2:
                 cc.settings = textinputCustom.value
-                print(f"Entered Address = {enteredAddress}")
+                logger.info(f"Entered Address = {enteredAddress}")
                 cc.lastPage = cc.page
                 cc.page = 3
                 textinputCustom.value = ''
