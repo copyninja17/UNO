@@ -37,24 +37,3 @@ assumedColour = '0'
 Winner = 'NONE'
 
 SERVER_EXIT = False
-
-
-#-----------------------------------
-# GUI
-#----------------------------------- 
-
-host = None
-
-settings = None
-
-buttonUpdate = 0
-
-Page = 0
-
-lastPage = None
-
-waitingTime = 0
-
-buttonFlip = 1
-
-counter = 0

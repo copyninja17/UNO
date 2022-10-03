@@ -119,7 +119,11 @@ class Client:
 def display(addrPort):
     address, port = addrPort.split(':')
 
-    client = Client(address, port)
+    try:
+        client = Client(address, port)
+    except Exception as e:
+        print(e)
+        cc.page = 0
     oldData = 'NEW'
 
     # Retrieve playerList (one time data)
@@ -261,7 +265,7 @@ def display(addrPort):
 
 
 def start():
-    if config.host is True:
+    if cc.host is True:
         if config.platform == 'Windows':
             subprocess.Popen([sys.executable, f'src/uno_server.py', f'{config.settings}'],
                             creationflags=subprocess.CREATE_NEW_CONSOLE)
@@ -274,5 +278,5 @@ def start():
         threading.Thread(target=display, args=('localhost:5555',)).start()
         # print("exec")
         
-    elif config.host is False:
+    elif cc.host is False:
         threading.Thread(target=display, args=(config.settings,)).start()
