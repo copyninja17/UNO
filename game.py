@@ -1,7 +1,7 @@
 from src import button
 import pygame_textinput as pti
-from src import config, uno_client
-from pages import hostPrompt, enterRoomSize, serverAddress, startGame
+from src import uno_client
+from pages import hostPrompt, enterRoomSize, startGame
 from src import clientConfig as cc
 
 import pygame
@@ -33,7 +33,7 @@ logging.basicConfig(filename=logname,
                     style='{')
 logger = logging.getLogger("client")
 
-config.platform = platform.system()
+cc.platform = platform.system()
 
 pygame.init()
 
@@ -276,7 +276,6 @@ while run:
     elif cc.page == 2:
         textinputCustom.update(events)
         serverAddressHeader.draw(screen)
-        serverAddress.display(screen, ngrokButton, ngrokFinButton)
 
         screen.blit(textinputCustom.surface, (SCREEN_WIDTH/2 - 50,
                                               SCREEN_HEIGHT/2 + ngrokImg.get_height()/2*0.27 + 7,
@@ -340,7 +339,7 @@ while run:
                 uno_client.start()
 
             elif cc.page == 2:
-                cc.settings = textinputCustom.value
+                cc.roomSize = textinputCustom.value
                 logger.info(f"Entered Address = {enteredAddress}")
                 cc.lastPage = cc.page
                 cc.page = 3

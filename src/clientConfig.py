@@ -28,5 +28,5 @@ enteredAddress = ''
 lastPage = None
 waitingTime = 0
 buttonUpdate = 0
-settings = None
+roomSize = None
 host = None

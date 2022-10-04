@@ -129,6 +129,7 @@ def display(addrPort):
     except Exception as e:
         logger.error(e)
         cc.page = 0
+        return
     oldData = 'NEW'
 
     # Retrieve playerList (one time data)
@@ -268,13 +269,13 @@ def display(addrPort):
 def start():
     if cc.host is True:
         try:
-            if config.platform == 'Windows':
-                subprocess.Popen([sys.executable, f'src/uno_server.py', f'{cc.settings}'],
+            if cc.platform == 'Windows':
+                subprocess.Popen([sys.executable, f'src/uno_server.py', f'{cc.roomSize}'],
                                 creationflags=subprocess.CREATE_NEW_CONSOLE)
             # else:
-                # subprocess.Popen(['python3.10', f'src/uno_server.py', f'{config.settings}'],
+                # subprocess.Popen(['python3.10', f'src/uno_server.py', f'{config.roomSize}'],
                 #                 shell=False)
-                # os.system(f'python3 src/uno_server.py {config.settings}')
+                # os.system(f'python3 src/uno_server.py {config.roomSize}')
 
             # print("before exec")
             threading.Thread(target=display, args=('localhost:5555',)).start()
@@ -283,4 +284,4 @@ def start():
             logger.error(e)
             
     elif cc.host is False:
-        threading.Thread(target=display, args=(cc.settings,)).start()
+        threading.Thread(target=display, args=(cc.roomSize,)).start()

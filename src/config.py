@@ -11,8 +11,6 @@ except:
 # Backend
 #----------------------------------- 
 
-platform = None
-
 myDeck = uno.Deck()
 myDeck.shuffle()
 
