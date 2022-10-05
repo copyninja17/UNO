@@ -339,8 +339,13 @@ while run:
                 uno_client.start()
 
             elif cc.page == 2:
-                cc.roomSize = textinputCustom.value
-                logger.info(f"Entered Address = {enteredAddress}")
+                cc.addrPort = textinputCustom.value
+                if cc.addrPort == '5555':
+                    cc.addrPort = f'localhost:{cc.addrPort}'
+                elif cc.addrPort.isnumeric():
+                    cc.addrPort = f'0.tcp.in.ngrok.io:{cc.addrPort}'
+                    
+                logger.info(f"Entered Address = {cc.addrPort}")
                 cc.lastPage = cc.page
                 cc.page = 3
                 textinputCustom.value = ''

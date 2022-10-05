@@ -196,7 +196,7 @@ def display(addrPort):
 
                         if played_card > 0 and played_card <= len(cc.playable_cards.stack):
                             logger.info(f'playable cards: {played_card}')
-                            # print(f"Card played: {cc.playable_cards.stack[played_card-1].show()}")
+                            logger.info(f"Card played: {cc.playable_cards.stack[played_card-1].show()}")
                             if cc.playable_cards.stack[played_card-1].card['colour'] == 'X':
                                 cc.colourChange = 0
                                 cc.event = 'colour_change'
@@ -284,4 +284,4 @@ def start():
             logger.error(e)
             
     elif cc.host is False:
-        threading.Thread(target=display, args=(cc.roomSize,)).start()
+        threading.Thread(target=display, args=(cc.addrPort,)).start()
