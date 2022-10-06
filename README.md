@@ -14,6 +14,7 @@ We are bringing this multiplayer card game to PC with support for more than 4 pl
 ### Upcoming Features
 - Party rules
 - Broadcasting
+- Animations
 
 
 # Installation
