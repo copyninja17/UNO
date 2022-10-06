@@ -5,13 +5,11 @@ Handles all client side operations like selection and communication.
 [TODO] Needs cleanup.
 '''
 
-from src import config
 from src.bridge import Network
 from src import uno_module as uno
 from src import clientConfig as cc
 import server
 
-import subprocess, sys, os
 import threading
 import logging
 
@@ -175,7 +173,7 @@ def display(addrPort):
 
             cc.event = ''
 
-            # # prints top card
+            # prints top card
             logger.info(f" Top card = {cc.top_card.show()} ")
             logger.info(f"Your cards: {cc.player_hand.show()}")
             

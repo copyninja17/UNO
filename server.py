@@ -4,17 +4,13 @@ Multithreaded Server for UNO.
 Handles all transactions and calculations related to players and cards.
 '''
 
-# try:
 from src import uno_module as uno
 from src import config as c
-# except:
-#     import uno_module as uno
-#     import config as c
+
 
 import socket
 from _thread import *
 import threading
-import sys
 import os
 import logging
 from datetime import datetime
@@ -367,7 +363,7 @@ def main(roomSize=None):
                             c.myStorage[name]['playerTurn'] = '0'
                             c.myStorage[name]['eventID'] = '0'
                             reply = encode(c.myStorage[name])
-                            logging.info(f"Data sent to name: {reply}")
+                            logging.info(f"Data sent to {name}: {reply}")
                         else:
                             reply = encode(c.myStorage[name])
 
