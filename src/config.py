@@ -35,3 +35,5 @@ assumedColour = '0'
 Winner = 'NONE'
 
 SERVER_EXIT = False
+
+currentId = '0'

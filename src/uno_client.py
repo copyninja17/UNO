@@ -9,6 +9,7 @@ from src import config
 from src.bridge import Network
 from src import uno_module as uno
 from src import clientConfig as cc
+import server
 
 import subprocess, sys, os
 import threading
@@ -122,6 +123,9 @@ class Client:
 
 
 def display(addrPort):
+    '''
+    Backend function for client
+    '''
     address, port = addrPort.split(':')
 
     try:
@@ -150,7 +154,7 @@ def display(addrPort):
             else:
                 oldData = data
 
-            # # data received
+            # data received
             (cc.top_card, 
              cc.player_hand, 
              cc.eventID, 
@@ -269,17 +273,9 @@ def display(addrPort):
 def start():
     if cc.host is True:
         try:
-            if cc.platform == 'Windows':
-                subprocess.Popen([sys.executable, f'src/uno_server.py', f'{cc.roomSize}'],
-                                creationflags=subprocess.CREATE_NEW_CONSOLE)
-            # else:
-                # subprocess.Popen(['python3.10', f'src/uno_server.py', f'{config.roomSize}'],
-                #                 shell=False)
-                # os.system(f'python3 src/uno_server.py {config.roomSize}')
-
-            # print("before exec")
+            threading.Thread(target=server.main, args=(int(cc.roomSize),)).start()
             threading.Thread(target=display, args=('localhost:5555',)).start()
-            # print("exec")
+
         except Exception as e:
             logger.error(e)
             
