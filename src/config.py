@@ -11,19 +11,18 @@ except:
 # Backend
 #----------------------------------- 
 
-platform = None
-
 myDeck = uno.Deck()
 myDeck.shuffle()
 
 myPreparations_complete = False
 
 myDiscard_pile = uno.Stack()
-myDiscard_pile.add(myDeck.deal(1))
 
 myStorage = 0
 
 myPlayerList = []
+
+playerCount = 0
 
 myPlayers = []
 
@@ -36,24 +35,3 @@ assumedColour = '0'
 Winner = 'NONE'
 
 SERVER_EXIT = False
-
-
-#-----------------------------------
-# GUI
-#----------------------------------- 
-
-host = None
-
-settings = None
-
-buttonUpdate = 0
-
-Page = 0
-
-lastPage = None
-
-waitingTime = 0
-
-buttonFlip = 1
-
-counter = 0

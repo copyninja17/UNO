@@ -1,26 +1,59 @@
 from src import button
 import pygame_textinput as pti
-from src import config, uno_client
-from pages import hostPrompt, enterRoomSize, serverAddress, startGame
+from src import uno_client
+from pages import hostPrompt, enterRoomSize, startGame
 from src import clientConfig as cc
 
 import pygame
 import platform
+import os
+import logging
+from datetime import datetime
+from pathlib import Path as PATH
 
 
-config.platform = platform.system()
+try:
+    os.mkdir(f"{PATH(__file__).parent.absolute()}/logs")
+except:
+    pass
+
+d1 = (f"{datetime.now().year}_{datetime.now().month}_{datetime.now().day}")
+i = 0
+while True:
+    if f'client_{d1}_{i}.log' in os.listdir(f"{PATH(__file__).parent.absolute()}/logs"):
+        i+=1
+    else:
+        logname = f'{PATH(__file__).parent.absolute()}/logs/client_{d1}_{i}.log'
+        break
+
+logging.basicConfig(filename=logname,
+                    filemode='a',
+                    format="[ {asctime} ][ {levelname} ][ {filename} ] {message}",
+                    level=logging.DEBUG,
+                    style='{')
+logger = logging.getLogger("client")
+
+cc.platform = platform.system()
 
 pygame.init()
 
 # create display window
-SCREEN_HEIGHT = 450
-SCREEN_WIDTH = 800
+SCREEN_HEIGHT = 600
+SCREEN_WIDTH = 1000
 TEXTBOX_WIDTH = 272
 TEXTBOX_HEIGHT = 35
 bPOsX = SCREEN_WIDTH/2
 bPosY = SCREEN_HEIGHT/2
 
-myFont = pygame.font.Font('assets/fonts/rimouski_sb.otf', 25)
+LIGHT_RED = (255,204,203)
+RED = (255,44,5)
+LIGHT_GREEN = (144,238,144)
+DARK_BG = (159, 179, 190)
+
+myFont = [None] * 3
+myFont[0] = pygame.font.Font('assets/fonts/rimouski_sb.otf', 25)
+myFont[1] = pygame.font.Font('assets/fonts/rimouski_sb.otf', 18)
+myFont[2] = pygame.font.Font('assets/fonts/rimouski_sb.otf', 32)
 
 clock = pygame.time.Clock()
 screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
@@ -40,9 +73,10 @@ createRoom = pygame.image.load(
     'assets/textures/createroom.png').convert_alpha()
 joinRoom = pygame.image.load('assets/textures/joinroom.png').convert_alpha()
 
-createButton = button.Button(100, 200, createRoom, 0.4)
-joinButton = button.Button(450, 200, joinRoom, 0.4)
-
+createButton = button.Button(SCREEN_WIDTH/6*2 - (createRoom.get_width()/2 * 0.4), 
+                             SCREEN_HEIGHT/2.25, createRoom, 0.4)
+joinButton = button.Button(SCREEN_WIDTH/6*4 - (joinRoom.get_width()/2 * 0.4), 
+                           SCREEN_HEIGHT/2.25, joinRoom, 0.4)
 
 # -----------------------------------
 # Room size
@@ -123,7 +157,7 @@ ngrokFinButton = button.Button(SCREEN_WIDTH/2 - ngrokFinImg.get_width()/2*2.8*0.
 textInputManager = pti.TextInputManager(
     validator=lambda input: len(input) <= 24)
 textinputCustom = pti.TextInputVisualizer(
-    manager=textInputManager, font_object=myFont)
+    manager=textInputManager, font_object=myFont[0])
 enteredAddress = ''
 
 
@@ -141,7 +175,8 @@ enterNameButton = button.Button(SCREEN_WIDTH/2-enterNameImg.get_width()/2*0.4,
 nameInputManager = pti.TextInputManager(
     validator=lambda input: len(input) <= 10)
 textinputName = pti.TextInputVisualizer(
-    manager=nameInputManager, font_object=myFont)
+    manager=nameInputManager, font_object=myFont[0])
+playerName_error = False
 
 
 # -----------------------------------
@@ -160,11 +195,10 @@ waitinglobbyButton = button.Button(SCREEN_WIDTH/2-waitinglobbyImg.get_width()/2*
 # game room
 # -----------------------------------
 
-tableImg = pygame.image.load('assets/textures/table.png').convert_alpha()
-tableButton = button.Button(SCREEN_WIDTH/2 - tableImg.get_width()/2*0.25,
-                            SCREEN_HEIGHT/2 - tableImg.get_height()/2*0.25,
-                            tableImg,
-                            0.25)
+tables = [0]*3
+tables[0] = pygame.image.load('assets/textures/uno_table.png').convert_alpha()
+tables[1] = pygame.image.load('assets/textures/uno_table_clockwise.png').convert_alpha()
+tables[2] = pygame.image.load('assets/textures/uno_table_anticlockwise.png').convert_alpha()
 
 colours = ['red', 'green', 'blue', 'yellow']
 cardsList = {}
@@ -181,6 +215,11 @@ for colour in colours:
         f'assets/textures/cards/{colour}/{colour}Rev.png').convert_alpha())
     cardsList[colour[0].upper()].append(pygame.image.load(
         f'assets/textures/cards/{colour}/{colour}Skip.png').convert_alpha())
+    cardsList[colour[0].upper()].append(pygame.image.load(
+        f'assets/textures/cards/{colour}/{colour}+4.png').convert_alpha())
+    cardsList[colour[0].upper()].append(pygame.image.load(
+        f'assets/textures/cards/{colour}/{colour}wild.png').convert_alpha())
+
 cardsList['X'] = []
 cardsList['X'].append(pygame.image.load(
     f'assets/textures/cards/others/X+4.png').convert_alpha())
@@ -206,7 +245,7 @@ for colour in colours:
 # Game Loop
 # -----------------------------------
 run = True
-config.buttonUpdate = 0
+cc.buttonUpdate = 0
 pygame.key.set_repeat(300, 25)
 
 while run:
@@ -215,28 +254,28 @@ while run:
     events = pygame.event.get()
 
     # back button
-    if config.Page and backButton.draw(screen) and config.Page < 5:
-        if config.Page == 3:
-            config.Page = config.lastPage
-            config.lastPage = 0
-        else:
-            config.Page = 0
+    if cc.page < 5 and cc.page > 0:
+        if backButton.draw(screen):
+            if cc.page == 3:
+                cc.page = cc.lastPage
+                cc.lastPage = 0
+            else:
+                cc.page = 0
 
     # create/join room
-    if config.Page == 0:
+    if cc.page == 0:
         hostPrompt.display(screen, createButton, joinButton)
 
     # enter room size
-    elif config.Page == 1:
+    elif cc.page == 1:
         enterRoomSizeHeader.draw(screen)
         enterRoomSize.display(screen, roomSizeButtons,
                               roomSizeButtonsFinal, roomSizeNames)
 
     # enter server address
-    elif config.Page == 2:
+    elif cc.page == 2:
         textinputCustom.update(events)
         serverAddressHeader.draw(screen)
-        serverAddress.display(screen, ngrokButton, ngrokFinButton)
 
         screen.blit(textinputCustom.surface, (SCREEN_WIDTH/2 - 50,
                                               SCREEN_HEIGHT/2 + ngrokImg.get_height()/2*0.27 + 7,
@@ -244,7 +283,15 @@ while run:
                                               TEXTBOX_HEIGHT))
 
     # enter name
-    elif config.Page == 3:
+    elif cc.page == 3:
+        if playerName_error:
+            playerName_warning = 'Name must contain atleast 3 alphabets and no special characters'
+            playerName_warning_label = myFont[1].render(f' {playerName_warning} ', 1, (255,255,255), RED)
+
+            x = SCREEN_WIDTH/2 - playerName_warning_label.get_width()/2
+            y = SCREEN_HEIGHT * 5/6
+            screen.blit(playerName_warning_label, (x,y))
+
         enterNameButton.draw(screen)
         textinputName.update(events)
         screen.blit(textinputName.surface, (SCREEN_WIDTH/2 - 50,
@@ -252,17 +299,17 @@ while run:
                                             TEXTBOX_WIDTH,
                                             TEXTBOX_HEIGHT))
 
-    elif config.Page == 4:
+    elif cc.page == 4:
         waitinglobbyButton.draw(screen)
         if cc.top_card:
-            config.Page = 5
+            cc.page = 5
 
-    elif config.Page == 5:
-        startGame.display(screen, tableButton, cardsList, gameplayImg, myFont)
+    elif cc.page == 5:
+        startGame.display(screen, tables, cardsList, gameplayImg, myFont)
 
-    if config.waitingTime:
-        pygame.time.wait(config.waitingTime)
-        config.waitingTime = 0
+    if cc.waitingTime:
+        pygame.time.wait(cc.waitingTime)
+        cc.waitingTime = 0
 
     # event handler
     for event in events:
@@ -270,28 +317,37 @@ while run:
         if event.type == pygame.QUIT:
             run = False
 
-        if config.buttonUpdate == 1:
-            if config.Page == 1:
+        if cc.buttonUpdate == 1:
+            if cc.page == 1:
                 pygame.display.update()
                 pygame.time.wait(250)
-                config.lastPage = config.Page
-                config.Page = 3
-                config.buttonUpdate = 0
+                cc.lastPage = cc.page
+                cc.page = 3
+                cc.buttonUpdate = 0
 
         if event.type == pygame.KEYDOWN and event.key == pygame.K_RETURN:
-            if config.Page == 3:
-                cc.playerName = textinputName.value
-                print(f"Name = {cc.playerName}")
-                config.Page = 4
-                # textinputName.value = ''
+            if cc.page == 3:
+                cc.playerName = textinputName.value.upper()
+                logger.info(f"Name = {cc.playerName}")
+                if len(cc.playerName) < 3 or not cc.playerName.isalnum():
+                    textinputName.value = ''
+                    cc.playerName = ''
+                    logger.info("playername refreshed")
+                    playerName_error = True
+                    break
+                cc.page = 4
                 uno_client.start()
-                # print("aage")
 
-            elif config.Page == 2:
-                config.settings = textinputCustom.value
-                print(f"Entered Address = {enteredAddress}")
-                config.lastPage = config.Page
-                config.Page = 3
+            elif cc.page == 2:
+                cc.addrPort = textinputCustom.value
+                if cc.addrPort == '5555':
+                    cc.addrPort = f'localhost:{cc.addrPort}'
+                elif cc.addrPort.isnumeric():
+                    cc.addrPort = f'0.tcp.in.ngrok.io:{cc.addrPort}'
+                    
+                logger.info(f"Entered Address = {cc.addrPort}")
+                cc.lastPage = cc.page
+                cc.page = 3
                 textinputCustom.value = ''
 
     pygame.display.update()

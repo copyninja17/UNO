@@ -12,6 +12,12 @@ from src import clientConfig as cc
 
 import subprocess, sys, os
 import threading
+import logging
+
+
+
+logger = logging.getLogger("client")
+
 
 class Client:
 
@@ -35,75 +41,81 @@ class Client:
         Data form: "topCard: playerHand: responseID: cardList: playerTurn: winner: chosenColour"
         [TODO]: what's going on in the game unrelated to the player aka Broadcasting
         '''
-        print(f'{data=}')                #DEBUGGING
+
+        logger.debug(f'{data=}')
 
         if ':' not in data and not cc.receivedPlayerList:
             # playerList received
             try:
-                print(f"Player list retrived: {data}")
+                logger.info(f"Player list retrived: {data}")
                 cc.receivedPlayerList = True
-                return data
+                return data.split(',') if ',' in data else [data,]
 
             except ValueError or TypeError or IndexError:
-                print("ERROR RETRIEVING DATA FROM SERVER!")
+                logger.error("ERROR RETRIEVING DATA FROM SERVER!")
                 return 0
         else:
             # game data received
             try:
-                print(data)                     # DEBUGGING
                 top_card = uno.Card()
-                top_card.generate(data.split(":")[0][-1], data.split(":")[0][:-1])
+                top_card.generate(data.split(':')[0][-1], data.split(':')[0][:-1])
 
                 player_hand = uno.Stack()
-                for i in list(data.split(":")[1].split(",")):
+                for i in list(data.split(':')[1].split(',')):
                     try:
                         sample = uno.Card()
                         sample.generate(i[-1], i[:-1])
                         player_hand.add(sample)
                     except:
-                        print("ERROR")
-                        print(data)
+                        logger.error(f"{data}")
 
-                eventID = int(data.split(":")[2])
+                eventID = int(data.split(':')[2])
 
                 drawn_cards = uno.Stack()
-                for i in list(data.split(":")[3].split(",")):
+                for i in list(data.split(':')[3].split(',')):
                     sample = uno.Card()
                     sample.generate(i[-1], i[:-1])
                     drawn_cards.add(sample)
 
-                playerTurn = bool(int(data.split(":")[4]))
+                playerTurn = data.split(':')[4]
 
-                winner = data.split(":")[5]
+                players = {}
+                for player in data.split(':')[5].split(','):
+                    players[player.split('=')[0]] = player.split('=')[1]
+                    
+                if not cc.old_card_dict:
+                    cc.old_card_dict = players.copy()
 
-                chosenColour = data.split(":")[6]
+                winner = data.split(':')[6]
+
+                chosenColour = data.split(':')[7]
 
                 return (top_card, 
                         player_hand, 
                         eventID, 
                         drawn_cards, 
                         playerTurn, 
+                        players, 
                         winner, 
                         chosenColour)
 
             except ValueError or TypeError or IndexError:
-                print ("ERROR RETRIEVING DATA FROM SERVER!")
-                print (data)
+                logger.error(f"ERROR RETRIEVING DATA FROM SERVER: {data}")
                 return 0, 0, 0, 0, 0
 
     def send_recv(self, oneTime=False):
         '''
         Sends data to server and returns reply.
 
-        ontTime: If True, exchanges playerName with playerList.
+        oneTime: If True, exchanges playerName with playerList.
         '''
 
         if oneTime:
             reply = self.net.communicate(self.playerName)
             return reply
         else:
-            data = (str(self.net.id) + ":" + 
-                    str(self.choice) + "," + 
+            data = (str(self.net.id) + ':' + 
+                    str(self.choice) + ',' + 
                     str(self.colour))
             reply = self.net.communicate(data)
             return reply
@@ -112,11 +124,21 @@ class Client:
 def display(addrPort):
     address, port = addrPort.split(':')
 
-    client = Client(address, port)
+    try:
+        client = Client(address, port)
+    except Exception as e:
+        logger.error(e)
+        cc.page = 0
+        return
     oldData = 'NEW'
 
     # Retrieve playerList (one time data)
     client.playerList = client.parse(client.send_recv(oneTime=True))
+    cc.playerList = client.playerList.copy()
+    cc.playerCount = len(cc.playerList)
+    
+    while cc.playerList[-1] != cc.playerName:
+        cc.playerList.append(cc.playerList.pop(0))
 
     while True:
         try:
@@ -134,26 +156,26 @@ def display(addrPort):
              cc.eventID, 
              cc.drawn_cards, 
              cc.playerTurn, 
+             cc.players, 
              cc.winner, 
              cc.chosenColour) = client.parse(data)
 
             # winner/loser
             if cc.winner == client.playerName:
-                print("\nYOU ARE THE WINNER!!\n")
+                logger.info("\nYOU ARE THE WINNER!!\n")
                 break
 
             elif cc.winner != 'NONE':
-                print(f"\nWinner is {cc.winner}\n")
+                logger.info(f"\nWinner is {cc.winner}\n")
                 break
 
+            cc.event = ''
+
             # # prints top card
-            # print("\n+" + "-"*(13+len(top_card.show())) + "+")
-            print("|" + f" Top card = {cc.top_card.show()} " + "|")
-            # print("+" + "-"*(13+len(top_card.show())) + "+")
+            logger.info(f" Top card = {cc.top_card.show()} ")
+            logger.info(f"Your cards: {cc.player_hand.show()}")
             
-            print(f"Your cards: {cc.player_hand.show()}")
-            
-            if cc.playerTurn is True:
+            if cc.playerTurn == cc.playerName:
 
                 if client.event[cc.eventID] == 'regular':
                     played_card = 0
@@ -173,10 +195,12 @@ def display(addrPort):
                             continue
 
                         if played_card > 0 and played_card <= len(cc.playable_cards.stack):
-                            print(f'pc: {played_card}')
-                            # print(f"Card played: {cc.playable_cards.stack[played_card-1].show()}")
+                            logger.info(f'playable cards: {played_card}')
+                            logger.info(f"Card played: {cc.playable_cards.stack[played_card-1].show()}")
                             if cc.playable_cards.stack[played_card-1].card['colour'] == 'X':
                                 cc.colourChange = 0
+                                cc.event = 'colour_change'
+
                                 while True:
                                     if cc.colourChange in ['R','B','G','Y']:
                                         client.colour = cc.colourChange
@@ -189,12 +213,14 @@ def display(addrPort):
                                 client.colour = '0'
                             break
                         else:
-                            print(f"Please enter a number between 1 and {len(cc.playable_cards.stack)}")
+                            logger.warning(f"Please enter a number between 1 and {len(cc.playable_cards.stack)}")
 
                     cc.playable_cards = None
                 elif client.event[cc.eventID] == 'no_cards':
-                    print(f"Your turn {client.playerName}:")
-                    print("You have no playable cards")
+                    logger.info(f"Your turn {client.playerName}:")
+                    logger.info("You have no playable cards")
+                    cc.event = 'no_cards'
+
                     cc.okPrompt = 0
                     while True:
                         if cc.okPrompt == 1:
@@ -205,8 +231,9 @@ def display(addrPort):
                     client.colour = 'N'
 
                 elif client.event[cc.eventID] == '+4/+2':
-                    print(f"+{len(cc.drawn_cards.stack)} was used on you")
-                    print(f"Cards drawn: {cc.drawn_cards.show()}")
+                    logger.info(f"+{len(cc.drawn_cards.stack)} was used on you")
+                    logger.info(f"Cards drawn: {cc.drawn_cards.show()}")
+                    cc.event = f'+{len(cc.drawn_cards.stack)}'
 
                     cc.okPrompt = 0
                     while True:
@@ -218,7 +245,8 @@ def display(addrPort):
                     client.colour = 'N'
 
                 elif client.event[cc.eventID] == 'skip':
-                    print("Your turn was skipped.")
+                    logger.info("Your turn was skipped.")
+                    cc.event = 'skip'
 
                     cc.okPrompt = 0
                     while True:
@@ -231,27 +259,29 @@ def display(addrPort):
             else:
                 client.colour = '0'
                 client.choice = '0'
-                print("not my turn")
+                logger.info("not my turn")
 
         except ValueError as e:
-            print("BAD VALUE")
-            print(e)
-            print(f'{data=}')
+            logger.error(f"BAD VALUE: {e}")
+            logger.error(f'{data=}')
 
 
 def start():
-    if config.host is True:
-        if config.platform == 'Windows':
-            subprocess.Popen([sys.executable, f'src/uno_server.py', f'{config.settings}'],
-                            creationflags=subprocess.CREATE_NEW_CONSOLE)
-        # else:
-            # subprocess.Popen(['python3.10', f'src/uno_server.py', f'{config.settings}'],
-            #                 shell=False)
-            # os.system(f'python3 src/uno_server.py {config.settings}')
+    if cc.host is True:
+        try:
+            if cc.platform == 'Windows':
+                subprocess.Popen([sys.executable, f'src/uno_server.py', f'{cc.roomSize}'],
+                                creationflags=subprocess.CREATE_NEW_CONSOLE)
+            # else:
+                # subprocess.Popen(['python3.10', f'src/uno_server.py', f'{config.roomSize}'],
+                #                 shell=False)
+                # os.system(f'python3 src/uno_server.py {config.roomSize}')
 
-        # print("before exec")
-        threading.Thread(target=display, args=('localhost:5555',)).start()
-        # print("exec")
-        
-    elif config.host is False:
-        threading.Thread(target=display, args=(config.settings,)).start()
+            # print("before exec")
+            threading.Thread(target=display, args=('localhost:5555',)).start()
+            # print("exec")
+        except Exception as e:
+            logger.error(e)
+            
+    elif cc.host is False:
+        threading.Thread(target=display, args=(cc.addrPort,)).start()

@@ -1,12 +1,13 @@
-from src import config
+from src import clientConfig as cc
+
 
 def display(screen, createButton, joinButton):
 	if createButton.draw(screen):
-		config.host = True
-		config.Page = 1
-		config.waitingTime = 200
+		cc.host = True
+		cc.page = 1
+		cc.waitingTime = 200
 
 	if joinButton.draw(screen):
-		config.host = False
-		config.Page = 2
-		config.waitingTime = 200
+		cc.host = False
+		cc.page = 2
+		cc.waitingTime = 200
