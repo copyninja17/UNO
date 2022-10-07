@@ -58,6 +58,8 @@ myFont[2] = pygame.font.Font('assets/fonts/rimouski_sb.otf', 32)
 clock = pygame.time.Clock()
 screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
 pygame.display.set_caption('UNO')
+uno_icon = pygame.image.load('assets/textures/uno.png').convert_alpha()
+pygame.display.set_icon(uno_icon)
 
 # -----------------------------------
 # Back Button
