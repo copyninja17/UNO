@@ -51,15 +51,16 @@ LIGHT_GREEN = (144,238,144)
 DARK_BG = (159, 179, 190)
 
 myFont = [None] * 3
-myFont[0] = pygame.font.Font('assets/fonts/rimouski_sb.otf', 25)
-myFont[1] = pygame.font.Font('assets/fonts/rimouski_sb.otf', 18)
-myFont[2] = pygame.font.Font('assets/fonts/rimouski_sb.otf', 32)
+myFont[0] = pygame.font.Font('assets/fonts/OpenSans-SemiBold.ttf', 25)
+myFont[1] = pygame.font.Font('assets/fonts/OpenSans-SemiBold.ttf', 18)
+myFont[2] = pygame.font.Font('assets/fonts/OpenSans-SemiBold.ttf', 32)
 
 clock = pygame.time.Clock()
 screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
 pygame.display.set_caption('UNO')
 uno_icon = pygame.image.load('assets/textures/uno.png').convert_alpha()
 pygame.display.set_icon(uno_icon)
+
 
 # -----------------------------------
 # Back Button
