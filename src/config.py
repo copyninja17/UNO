@@ -31,6 +31,7 @@ assumedColour = '0'
 
 Winner = 'NONE'
 
+func_closed = [False,]
 SERVER_EXIT = False
 
 currentId = '0'

@@ -202,8 +202,10 @@ def main(roomSize=None):
         while True:
             try:
                 if roomSize == len(c.myPlayerList):    prepare()
-                else:                                       continue
+                else:                                  continue
 
+                if c.SERVER_EXIT == True:    return
+                
                 logging.info(f"It's {c.myPlayers[0]['name']} turn")
 
                 if c.actionEffect == False:
@@ -219,6 +221,8 @@ def main(roomSize=None):
                         c.myStorage = database(c.myPlayers[0]['name'], 1)
                         while True:
                             # trapping until input is recieved
+                            if c.SERVER_EXIT == True:    return
+
                             choice = int(
                                 c.myReplies[c.myPlayers[0]['name']]['choice'])
                             if choice != 0:
@@ -243,7 +247,7 @@ def main(roomSize=None):
                                 if len(c.myPlayers[0]['hand'].stack) == 0:
                                     logging.info(f"Winner is {c.myPlayers[0]['name']}!!")
                                     c.Winner = str(c.myPlayers[0]['name'])
-                                    # c.SERVER_EXIT = True
+                                    c.func_closed[0] = True
                                     c.myPlayers[0]['hand'].add(c.myDiscard_pile.deal(0,0))
                                 break
 
@@ -262,6 +266,8 @@ def main(roomSize=None):
 
                         while True:
                             # trapping until input is recieved
+                            if c.SERVER_EXIT == True:    return
+
                             colour = c.myReplies[c.myPlayers[0]['name']]['colour']
                             if colour == 'N':  # N = Nil[client has received data]
                                 logging.info(f"{c.myPlayers[0]['name']} has received his card")
@@ -279,6 +285,8 @@ def main(roomSize=None):
 
                         while True:
                             # trapping until input is recieved
+                            if c.SERVER_EXIT == True:    return
+
                             colour = c.myReplies[c.myPlayers[0]['name']]['colour']
                             if colour == 'N':  # N = Nil[client has received data]
                                 logging.info(f"{c.myPlayers[0]['name']} has agreed")
@@ -294,6 +302,8 @@ def main(roomSize=None):
                                                     drawn_cards)
                         while True:
                             # trapping until input is recieved
+                            if c.SERVER_EXIT == True:    return
+
                             colour = c.myReplies[c.myPlayers[0]['name']]['colour']
                             if colour == 'N':  # N = Nil[client has received data]
                                 logging.info(f"{c.myPlayers[0]['name']} has received 2 cards")
@@ -311,6 +321,8 @@ def main(roomSize=None):
                             c.myPlayers[0]['name'], 3, drawn_cards)
                         while True:
                             # trapping until input is recieved
+                            if c.SERVER_EXIT == True:    return
+
                             colour = c.myReplies[c.myPlayers[0]
                                                     ['name']]['colour']
                             if colour == 'N':  # N = Nil[client has received data]
@@ -318,19 +330,13 @@ def main(roomSize=None):
                                 break
                         c.myPlayers.append(c.myPlayers.pop(0))
 
-                # if c.SERVER_EXIT:
-                #     print("Game ends\nThank you for playing!")
-                #     break
-
             except KeyboardInterrupt:
-                c.SERVER_EXIT = True
+                c.func_closed[0] = True
                 break
             except Exception as e:
                 raise
 
-
-    th = threading.Thread(target=threaded_server)
-    th.start()
+    th = threading.Thread(target=threaded_server).start()
 
 
     #############################
@@ -343,11 +349,12 @@ def main(roomSize=None):
         '''
         conn.send(str.encode(c.currentId))
         c.currentId = str(int(c.currentId) + 1)
+        my_ID = int(c.currentId)
         reply = ''
         name = f"player-{c.currentId}"
-        while True:
-            # if c.SERVER_EXIT:  break
+        c.func_closed.append(False)
 
+        while True:
             try:
                 data = conn.recv(2048)
                 reply = data.decode('utf-8')
@@ -356,7 +363,6 @@ def main(roomSize=None):
                     break
                 else:
                     if ":" in reply:  # if client requests game data
-                        # print(name)
                         c.myReplies[name]['choice'], c.myReplies[name]['colour'] = parse(
                             reply)
                         if c.myReplies[name]['choice'] != '0':
@@ -387,8 +393,8 @@ def main(roomSize=None):
                     conn.sendall(str.encode(reply))
 
             except KeyboardInterrupt:
-                c.SERVER_EXIT = True
-                break
+                c.func_closed[my_ID] = True
+                
             except Exception as e:
                 logging.error("Break from threaded_client")
                 logging.error(e)
@@ -396,6 +402,12 @@ def main(roomSize=None):
 
         logging.warning(f"Connection Closed for {name}")
         conn.close()
+
+        c.func_closed[my_ID] = True
+        if not (False in c.func_closed):
+            c.SERVER_EXIT = True
+
+        return
 
 
     while True:
@@ -406,11 +418,15 @@ def main(roomSize=None):
             conn, addr = s.accept()
             logging.info(f"Connected to: {addr}")
             start_new_thread(threaded_client, (conn,))
+
+            if c.SERVER_EXIT:
+                return
+
         except KeyboardInterrupt:
             logging.info("server closed")
-            c.SERVER_EXIT = True
-            break
+
 
 if __name__ == '__main__':
     roomSize = int(input("Enter room size: "))
     main(roomSize)
+    
